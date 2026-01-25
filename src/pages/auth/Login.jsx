@@ -1,34 +1,74 @@
-import { Link } from "react-router-dom";
-import Input from "../../components/common/Input";
-import Button from "../../components/common/Button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../services/authService";
 import "./Auth.css";
 
-export default function Login() {
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      const res = await loginUser({ email, password });
+      alert(res.data.message || "Login successful!");
+      navigate("/dashboard"); 
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          "Invalid email or password"
+      );
+    }
+  };
+
   return (
-    <div className="auth-container">
-      <div className="auth-left">
-        <h1>Multi-Branch Franchise System</h1>
-        <p>Centralized management for all franchise operations</p>
+    <div className="login-page">
+      
+      <div className="login-left">
+        <h1>Franchise Management System</h1>
+        <p>
+          A centralized platform to manage franchises, branches, employees,
+          sales, inventory, and notifications efficiently.
+        </p>
+        <ul>
+          <li>✔ Secure role-based access</li>
+          <li>✔ OTP-based authentication</li>
+          <li>✔ Real-time operational insights</li>
+        </ul>
       </div>
 
-      <div className="auth-right">
+     
+      <div className="login-right">
         <div className="auth-card">
-          <h2>Login</h2>
+          <h2 className="auth-title">Login</h2>
 
-          <Input type="email" placeholder="Email ID" />
-          <Input type="password" placeholder="Password" />
+          <input
+            className="auth-input"
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <Button text="Login" />
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-          <p className="auth-link">Forgot Password?</p>
+          <button className="auth-btn" onClick={handleLogin}>
+            Login
+          </button>
 
-          <div className="divider">OR</div>
-
-          <Link to="/register" className="auth-link">
-            Register
-          </Link>
+          <div className="auth-link">
+            <span onClick={() => navigate("/register")}>
+              New user? Register
+            </span>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Login;

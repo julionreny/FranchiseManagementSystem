@@ -1,35 +1,40 @@
-import { Link } from "react-router-dom";
-import Input from "../../components/common/Input";
-import Button from "../../components/common/Button";
+import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-export default function Register() {
+const Register = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="auth-container">
-      <div className="auth-right full">
-        <div className="auth-card">
-          
-          {/* Back Button */}
-          <Link to="/" className="back-link">← Back to Login</Link>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 className="auth-title">Register As</h2>
 
-          <h2 className="auth-title">Create Account</h2>
-
-          <Input type="text" placeholder="Full Name" />
-          <Input type="email" placeholder="Email ID" />
-          <Input type="password" placeholder="Password" />
-
-          <div className="role-select">
-            <label>
-              <input type="radio" name="role" /> Branch Manager
-            </label>
-            <label>
-              <input type="radio" name="role" /> Franchise Owner
-            </label>
+        <div className="role-container">
+          <div
+            className="role-card"
+            onClick={() => navigate("/register/owner")}
+          >
+            <h3>Franchise Owner</h3>
+            <p>Create and manage franchises</p>
           </div>
 
-          <Button text="Continue" />
+          <div
+            className="role-card"
+            onClick={() => navigate("/register/manager")}
+          >
+            <h3>Branch Manager</h3>
+            <p>Manage assigned branch</p>
+          </div>
+        </div>
+
+        <div className="auth-link">
+          <span onClick={() => navigate("/")}>
+            Already have an account? Login
+          </span>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Register;

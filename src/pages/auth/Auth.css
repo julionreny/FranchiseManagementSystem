@@ -1,143 +1,228 @@
-/* Global reset */
+/* ===== Global Reset ===== */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.auth-container {
-  display: flex;
-  height: 100vh;
+body {
+  background: radial-gradient(circle at top, #0f172a, #020617);
   font-family: "Inter", "Segoe UI", sans-serif;
-  background: #f4f6fb;
+  color: #e5e7eb;
 }
 
-/* LEFT PANEL (Login page only) */
-.auth-left {
-  flex: 1;
-  background: linear-gradient(135deg, #2563eb, #1e3a8a);
-  color: #ffffff;
-  padding: 80px 60px;
-}
-
-.auth-left h1 {
-  font-size: 32px;
-  margin-bottom: 16px;
-}
-
-.auth-left p {
-  font-size: 16px;
-  line-height: 1.6;
-  opacity: 0.9;
-}
-
-/* RIGHT PANEL */
-.auth-right {
-  flex: 1;
+/* ===== Auth Page Wrapper ===== */
+.auth-page {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.auth-right.full {
-  flex: 1;
-}
-
-/* CARD */
+/* ===== Auth Card ===== */
 .auth-card {
-  width: 360px;
-  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  background: #020617;
   padding: 32px;
-  border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* TITLES */
+/* ===== Titles ===== */
 .auth-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 20px;
   text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #f8fafc;
 }
 
-/* INPUTS */
+/* ===== Inputs ===== */
 .auth-input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 13px 14px;
   margin-bottom: 14px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #e5e7eb;
   font-size: 14px;
+}
+
+.auth-input::placeholder {
+  color: #64748b;
 }
 
 .auth-input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* BUTTON */
+/* ===== Primary Button ===== */
 .auth-btn {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  color: #ffffff;
+  padding: 13px;
+  margin-top: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  margin-top: 10px;
   transition: all 0.3s ease;
 }
 
 .auth-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
 }
 
-/* LINKS */
-.auth-link {
+/* ===== Role Selection ===== */
+.role-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.role-card {
+  padding: 20px;
+  border-radius: 14px;
+  background: #020617;
+  border: 1px solid #1e293b;
   text-align: center;
-  margin-top: 14px;
-  color: #2563eb;
-  font-size: 14px;
   cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.auth-link:hover {
-  text-decoration: underline;
+.role-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #e5e7eb;
 }
 
-/* BACK LINK */
-.back-link {
-  display: inline-block;
-  margin-bottom: 12px;
-  font-size: 14px;
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.back-link:hover {
-  text-decoration: underline;
-}
-
-/* DIVIDER */
-.divider {
-  text-align: center;
-  margin: 16px 0;
+.role-card p {
   font-size: 13px;
-  color: #6b7280;
+  color: #94a3b8;
 }
 
-/* ROLE SELECT */
-.role-select {
-  display: flex;
-  justify-content: space-between;
-  margin: 14px 0;
+.role-card:hover {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  border-color: #3b82f6;
+}
+
+.role-card:hover h3,
+.role-card:hover p {
+  color: #ffffff;
+}
+
+/* ===== Links ===== */
+.auth-link {
+  margin-top: 18px;
+  text-align: center;
   font-size: 14px;
 }
 
-.role-select label {
+.auth-link span {
+  color: #60a5fa;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-link span:hover {
+  text-decoration: underline;
+}
+
+/* ===== Messages ===== */
+.success-msg {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.error-msg {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+/* ===== Login Split Layout ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* LEFT PANEL */
+.login-left {
+  flex: 1;
+  background: linear-gradient(135deg, #020617, #020617);
+  color: #e5e7eb;
+  padding: 90px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-left h1 {
+  font-size: 38px;
+  margin-bottom: 22px;
+  color: #f8fafc;
+}
+
+.login-left p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #cbd5f5;
+  margin-bottom: 24px;
+}
+
+.login-left ul {
+  list-style: none;
+  padding: 0;
+}
+
+.login-left li {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #94a3b8;
+}
+
+/* RIGHT PANEL */
+.login-right {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-left {
+    padding: 50px 30px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    margin: 16px;
+    padding: 24px;
+  }
 }
