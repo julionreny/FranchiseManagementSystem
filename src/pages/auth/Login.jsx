@@ -9,17 +9,29 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const res = await loginUser({ email, password });
-      alert(res.data.message || "Login successful!");
-      navigate("/dashboard"); 
-    } catch (err) {
-      alert(
-        err.response?.data?.message ||
-          "Invalid email or password"
-      );
+  try {
+    const res = await loginUser({ email, password });
+
+    alert(res.data.message || "Login successful!");
+
+    const roleId = res.data.user.role_id;
+
+    if (roleId === 1) {
+      navigate("/owner-dashboard");
+    } else if (roleId === 2) {
+      navigate("/manager-dashboard");
+    } else {
+      alert("Unknown role");
     }
-  };
+
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+      "Invalid email or password"
+    );
+  }
+};
+
 
   return (
     <div className="login-page">
