@@ -28,9 +28,9 @@ const Register = () => {
         </div>
 
         <div className="auth-link">
-          <span onClick={() => navigate("/")}>
-            Already have an account? Login
-          </span>
+          <span onClick={() => navigate("/login")}>
+  Already have an account? Login
+</span>
         </div>
       </div>
     </div>

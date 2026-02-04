@@ -7,6 +7,9 @@ const API = axios.create({
 export const sendOwnerOtp = (email) =>
   API.post("/owner/send-otp", { email });
 
+export const sendManagerOtp = (email) =>
+  API.post("/manager/send-otp", { email });
+
 export const verifyOtp = (email, otp) =>
   API.post("/verify-otp", { email, otp });
 

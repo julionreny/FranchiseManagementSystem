@@ -12,17 +12,16 @@ const Login = () => {
   try {
     const res = await loginUser({ email, password });
 
-    alert(res.data.message || "Login successful!");
+localStorage.setItem("user", JSON.stringify(res.data.user));
 
-    const roleId = res.data.user.role_id;
+console.log("Navigating to owner dashboard");
 
-    if (roleId === 1) {
-      navigate("/owner-dashboard");
-    } else if (roleId === 2) {
-      navigate("/manager-dashboard");
-    } else {
-      alert("Unknown role");
-    }
+if (res.data.user.role_id === 1) {
+  navigate("/owner-dashboard", { replace: true });
+} else if (res.data.user.role_id === 2) {
+  navigate("/manager-dashboard", { replace: true });
+}
+
 
   } catch (err) {
     alert(
