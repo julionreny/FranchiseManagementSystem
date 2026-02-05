@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DashboardLayout from "./DashboardLayout";
 import StatCard from "../../components/dashboard/StatCard";
 import { createBranch } from "../../services/branchService";
 import { getOwnerFranchise } from "../../services/franchiseService";
+import "./Dashboard.css";
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
@@ -74,15 +74,11 @@ const OwnerDashboard = () => {
      LOADING STATE
      ========================= */
   if (!franchise) {
-    return (
-      <DashboardLayout>
-        <h3>Loading franchise details...</h3>
-      </DashboardLayout>
-    );
+    return <h3>Loading franchise details...</h3>;
   }
 
   return (
-    <DashboardLayout>
+    <div>
       <h1>Owner Dashboard</h1>
 
       {/* STATS */}
@@ -134,7 +130,7 @@ const OwnerDashboard = () => {
           </p>
         </div>
       )}
-    </DashboardLayout>
+    </div>
   );
 };
 

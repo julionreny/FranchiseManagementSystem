@@ -1,6 +1,4 @@
 import { useState } from "react";
-import Navbar from "../../components/dashboard/Navbar";
-import Sidebar from "../../components/dashboard/Sidebar";
 import "./Inventory.css";
 
 export default function Inventory() {
@@ -79,16 +77,11 @@ export default function Inventory() {
   };
 
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="dashboard-main">
-        <Navbar />
+    <div>
+      <div className="inventory-header">
+        <h1>Inventory Management</h1>
 
-        <div className="dashboard-content">
-          <div className="inventory-header">
-            <h1>Inventory Management</h1>
-
-            <div className="inventory-buttons">
+        <div className="inventory-buttons">
               <button className="primary-btn" onClick={() => setShowAddModal(true)}>
                 + Add Item
               </button>
@@ -105,86 +98,84 @@ export default function Inventory() {
                   Confirm Remove
                 </button>
               )}
-            </div>
-          </div>
-
-          <div className="inventory-controls">
-            <input
-              type="text"
-              placeholder="Search inventory..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={lowStockOnly}
-                onChange={() => setLowStockOnly(!lowStockOnly)}
-              />
-              Low Stock Only
-            </label>
-          </div>
-
-          <div className="inventory-table-wrapper">
-            <table className="inventory-table">
-              <thead>
-                <tr>
-                  {removeMode && <th></th>}
-                  <th>Item</th>
-                  <th>Category</th>
-                  <th>Stock</th>
-                  <th>Min Required</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredInventory.map(item => {
-                  const status = getStatus(item.stock, item.min);
-
-                  return (
-                    <tr key={item.id}>
-                      {removeMode && (
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={selectedItems.includes(item.id)}
-                            onChange={() => toggleSelect(item.id)}
-                          />
-                        </td>
-                      )}
-                      <td>{item.name}</td>
-                      <td>
-                        <span className="category-badge">{item.category}</span>
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          className="stock-input"
-                          value={item.stock}
-                          onChange={(e) =>
-                            updateStock(item.id, e.target.value)
-                          }
-                        />
-                      </td>
-                      <td>{item.min}</td>
-                      <td>
-                        <span className={`status ${status}`}>
-                          {status === "in"
-                            ? "In Stock"
-                            : status === "low"
-                            ? "Low Stock"
-                            : "Out of Stock"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         </div>
+      </div>
+
+      <div className="inventory-controls">
+        <input
+          type="text"
+          placeholder="Search inventory..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={lowStockOnly}
+            onChange={() => setLowStockOnly(!lowStockOnly)}
+          />
+          Low Stock Only
+        </label>
+      </div>
+
+      <div className="inventory-table-wrapper">
+        <table className="inventory-table">
+        <thead>
+          <tr>
+            {removeMode && <th></th>}
+            <th>Item</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Min Required</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredInventory.map(item => {
+            const status = getStatus(item.stock, item.min);
+
+            return (
+              <tr key={item.id}>
+                {removeMode && (
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => toggleSelect(item.id)}
+                    />
+                  </td>
+                )}
+                <td>{item.name}</td>
+                <td>
+                  <span className="category-badge">{item.category}</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    className="stock-input"
+                    value={item.stock}
+                    onChange={(e) =>
+                      updateStock(item.id, e.target.value)
+                    }
+                  />
+                </td>
+                <td>{item.min}</td>
+                <td>
+                  <span className={`status ${status}`}>
+                    {status === "in"
+                      ? "In Stock"
+                      : status === "low"
+                      ? "Low Stock"
+                      : "Out of Stock"}
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+        </table>
       </div>
 
       {/* Add Item Modal */}

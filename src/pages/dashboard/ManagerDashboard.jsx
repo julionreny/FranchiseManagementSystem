@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import DashboardLayout from "./DashboardLayout";
 import StatCard from "../../components/dashboard/StatCard";
+import "./Dashboard.css";
 
 const ManagerDashboard = () => {
   const [user, setUser] = useState(null);
@@ -21,7 +21,7 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <DashboardLayout>
+    <div>
       <h1>Branch Manager Dashboard</h1>
 
       <div className="stats-grid">
@@ -30,7 +30,7 @@ const ManagerDashboard = () => {
         <StatCard title="Inventory Items" value="120" />
         <StatCard title="Employees" value="10" />
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

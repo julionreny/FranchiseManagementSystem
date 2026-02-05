@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 import "./Dashboard.css";
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const DashboardLayout = ({ children }) => {
       <div className="dashboard-main">
         <Navbar />
         <div className="dashboard-content">
-          {children}
+          <Outlet />
         </div>
       </div>
     </div>

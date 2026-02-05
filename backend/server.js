@@ -5,6 +5,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const branchRoutes = require("./routes/branchRoutes");
 const franchiseRoutes = require("./routes/franchiseRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
 const app = express();
 
@@ -17,15 +18,12 @@ app.use(
   })
 );
 
-
-
-app.use("/api/franchises", franchiseRoutes);
-
-
-/* ✅ Body parser */
+/* ✅ Body parser - MUST come before routes */
 app.use(express.json());
 
 /* ✅ Routes */
+app.use("/api/franchises", franchiseRoutes);
+app.use("/api/expenses", expenseRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/branches", branchRoutes);
 
@@ -36,11 +34,4 @@ app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
 });
 
-
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
-
-app.use(express.json());
 
