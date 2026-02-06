@@ -4,9 +4,19 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // normalize role_id (important)
+  const roleId = Number(user?.role_id);
+
+  const isOwner = roleId === 1;
+  const isManager = roleId === 2;
+
+  // base dashboard path
+  const basePath = isOwner
+    ? "/owner-dashboard"
+    : "/manager-dashboard";
+
   const handleLogout = () => {
     localStorage.removeItem("user");
-    alert("Logged out successfully");
     navigate("/login");
   };
 
@@ -16,26 +26,32 @@ const Sidebar = () => {
 
       <ul className="sidebar-menu">
         {/* DASHBOARD */}
-        {user?.role_id === 1 && (
-          <li onClick={() => navigate("/owner-dashboard")}>
-            Dashboard
-          </li>
-        )}
+        <li onClick={() => navigate(basePath)}>Dashboard</li>
 
-        {user?.role_id === 2 && (
-          <li onClick={() => navigate("/manager-dashboard")}>
-            Dashboard
-          </li>
+        {/* COMMON MODULES (OWNER + MANAGER) */}
+        {(isOwner || isManager) && (
+          <>
+            <li onClick={() => navigate(`${basePath}/sales`)}>
+              Sales
+            </li>
+            <li onClick={() => navigate(`${basePath}/inventory`)}>
+              Inventory
+            </li>
+            <li onClick={() => navigate(`${basePath}/employees`)}>
+              Employees
+            </li>
+            <li onClick={() => navigate(`${basePath}/expenses`)}>
+              Expenses
+            </li>
+            <li
+              onClick={() =>
+                navigate(`${basePath}/notifications`)
+              }
+            >
+              Notifications
+            </li>
+          </>
         )}
-
-        {/* COMMON MODULES */}
-        <li onClick={() => navigate("/sales")}>Sales</li>
-        <li onClick={() => navigate("/inventory")}>Inventory</li>
-        <li onClick={() => navigate("/employees")}>Employees</li>
-        <li onClick={() => navigate("/expenses")}>Expenses</li>
-        <li onClick={() => navigate("/notifications")}>
-          Notifications
-        </li>
 
         {/* LOGOUT */}
         <li onClick={handleLogout} style={{ color: "#ef4444" }}>

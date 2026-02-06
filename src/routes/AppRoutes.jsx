@@ -17,26 +17,26 @@ import Notifications from "../pages/notifications/Notifications";
 
 const AppRoutes = () => (
   <Routes>
-    {/* AUTH */}
+    {/* AUTH ROUTES */}
     <Route path="/" element={<Navigate to="/login" />} />
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/register/owner" element={<OwnerRegister />} />
     <Route path="/register/manager" element={<ManagerRegister />} />
 
-    {/* OWNER */}
-    <Route element={<DashboardLayout />}>
-      <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+    {/* OWNER DASHBOARD */}
+    <Route path="/owner-dashboard" element={<DashboardLayout />}>
+      <Route index element={<OwnerDashboard />} />
     </Route>
 
-    {/* MANAGER DASHBOARD WITH LAYOUT */}
-    <Route element={<DashboardLayout />}>
-      <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-      <Route path="/sales" element={<Sales />} />
-      <Route path="/inventory" element={<Inventory />} />
-      <Route path="/employees" element={<Employee />} />
-      <Route path="/expenses" element={<Expenses />} />
-      <Route path="/notifications" element={<Notifications />} />
+    {/* MANAGER DASHBOARD + MODULES */}
+    <Route path="/manager-dashboard" element={<DashboardLayout />}>
+      <Route index element={<ManagerDashboard />} />
+      <Route path="sales" element={<Sales />} />
+      <Route path="inventory" element={<Inventory />} />
+      <Route path="employees" element={<Employee />} />
+      <Route path="expenses" element={<Expenses />} />
+      <Route path="notifications" element={<Notifications />} />
     </Route>
   </Routes>
 );
