@@ -1,232 +1,225 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Inventory.css";
+import {
+  getInventory,
+  addItem,
+  updateStock,
+  deleteItem,
+} from "../../services/inventoryService";
 
-export default function Inventory() {
+const Inventory = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const branchId = user?.branch_id;
+
+  const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
-  const [lowStockOnly, setLowStockOnly] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [removeMode, setRemoveMode] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [lowOnly, setLowOnly] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-  const [inventory, setInventory] = useState([
-    { id: 1, name: "Shampoo", category: "Groceries", stock: 5, min: 10 },
-    { id: 2, name: "Soap", category: "Groceries", stock: 3, min: 8 },
-    { id: 3, name: "Laptop", category: "Electronics", stock: 5, min: 3 },
-    { id: 4, name: "Rice Bags", category: "Raw Material", stock: 0, min: 8 },
-    { id: 5, name: "Syrup", category: "Beverages", stock: 11, min: 6 }
-  ]);
-
-  const [newItem, setNewItem] = useState({
-    name: "",
-    category: "",
-    stock: "",
-    min: ""
+  const [form, setForm] = useState({
+    product_name: "",
+    quantity: "",
+    reorder_level: "",
   });
 
-  const getStatus = (stock, min) => {
-    if (stock === 0) return "out";
-    if (stock < min) return "low";
-    return "in";
+  const fetchInventory = async () => {
+    const res = await getInventory(branchId);
+    setItems(res.data);
   };
 
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.category.toLowerCase().includes(search.toLowerCase());
+  useEffect(() => {
+    fetchInventory();
+  }, []);
 
-    const isLowStock = item.stock < item.min;
-    return lowStockOnly ? matchesSearch && isLowStock : matchesSearch;
+  const handleAdd = async () => {
+    if (!form.product_name) return alert("Product name required");
+
+    await addItem({
+      ...form,
+      branch_id: branchId,
+    });
+
+    setForm({ product_name: "", quantity: "", reorder_level: "" });
+    setShowForm(false);
+    fetchInventory();
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Remove this item?")) return;
+    await deleteItem(id);
+    fetchInventory();
+  };
+
+  const changeStock = async (id, change) => {
+    await updateStock(id, change);
+    fetchInventory();
+  };
+
+  const filtered = items.filter((item) => {
+    const matchSearch = item.product_name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchLow = lowOnly
+      ? item.quantity < item.reorder_level
+      : true;
+
+    return matchSearch && matchLow;
   });
-
-  const handleAddItem = () => {
-    if (!newItem.name || !newItem.category) return;
-
-    setInventory([
-      ...inventory,
-      {
-        id: Date.now(),
-        name: newItem.name,
-        category: newItem.category,
-        stock: Number(newItem.stock),
-        min: Number(newItem.min)
-      }
-    ]);
-
-    setNewItem({ name: "", category: "", stock: "", min: "" });
-    setShowAddModal(false);
-  };
-
-  const toggleSelect = (id) => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
-  };
-
-  const confirmRemove = () => {
-    setInventory(inventory.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
-    setRemoveMode(false);
-  };
-
-  const updateStock = (id, value) => {
-    setInventory(
-      inventory.map(item =>
-        item.id === id ? { ...item, stock: Number(value) } : item
-      )
-    );
-  };
 
   return (
-    <div>
+    <div className="inventory-page">
+      {/* HEADER */}
       <div className="inventory-header">
         <h1>Inventory Management</h1>
-
-        <div className="inventory-buttons">
-              <button className="primary-btn" onClick={() => setShowAddModal(true)}>
-                + Add Item
-              </button>
-
-              <button
-                className="primary-btn danger-outline"
-                onClick={() => setRemoveMode(!removeMode)}
-              >
-                Remove Items
-              </button>
-
-              {removeMode && (
-                <button className="danger-btn" onClick={confirmRemove}>
-                  Confirm Remove
-                </button>
-              )}
-        </div>
+        <button onClick={() => setShowForm(true)}>+ Add Item</button>
       </div>
 
-      <div className="inventory-controls">
+      {/* SEARCH + FILTER */}
+      <input
+        type="text"
+        placeholder="Search inventory..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <label className="low-stock-toggle">
         <input
-          type="text"
-          placeholder="Search inventory..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          type="checkbox"
+          checked={lowOnly}
+          onChange={() => setLowOnly(!lowOnly)}
         />
+        Low Stock Only
+      </label>
 
-        <label className="checkbox">
+      {/* ADD ITEM MODAL */}
+      {showForm && (
+        <div className="inventory-modal">
+          <h3>Add Inventory Item</h3>
+
+              <input
+                type="text"
+                placeholder="Product Name"
+                value={form.product_name}
+                onChange={(e) =>
+                  setForm({ ...form, product_name: e.target.value })
+                }
+              />
+
           <input
-            type="checkbox"
-            checked={lowStockOnly}
-            onChange={() => setLowStockOnly(!lowStockOnly)}
+            type="number"
+            placeholder="Quantity"
+            value={form.quantity}
+            onChange={(e) =>
+              setForm({ ...form, quantity: e.target.value })
+            }
           />
-          Low Stock Only
-        </label>
-      </div>
 
-      <div className="inventory-table-wrapper">
-        <table className="inventory-table">
-        <thead>
-          <tr>
-            {removeMode && <th></th>}
-            <th>Item</th>
-            <th>Category</th>
-            <th>Stock</th>
-            <th>Min Required</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+          <input
+            type="number"
+            placeholder="Reorder Level"
+            value={form.reorder_level}
+            onChange={(e) =>
+              setForm({ ...form, reorder_level: e.target.value })
+            }
+          />
 
-        <tbody>
-          {filteredInventory.map(item => {
-            const status = getStatus(item.stock, item.min);
-
-            return (
-              <tr key={item.id}>
-                {removeMode && (
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => toggleSelect(item.id)}
-                    />
-                  </td>
-                )}
-                <td>{item.name}</td>
-                <td>
-                  <span className="category-badge">{item.category}</span>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    className="stock-input"
-                    value={item.stock}
-                    onChange={(e) =>
-                      updateStock(item.id, e.target.value)
-                    }
-                  />
-                </td>
-                <td>{item.min}</td>
-                <td>
-                  <span className={`status ${status}`}>
-                    {status === "in"
-                      ? "In Stock"
-                      : status === "low"
-                      ? "Low Stock"
-                      : "Out of Stock"}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        </table>
-      </div>
-
-      {/* Add Item Modal */}
-      {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Add Inventory Item</h2>
-
-            <input
-              placeholder="Item Name"
-              value={newItem.name}
-              onChange={(e) =>
-                setNewItem({ ...newItem, name: e.target.value })
-              }
-            />
-
-            <input
-              placeholder="Category"
-              value={newItem.category}
-              onChange={(e) =>
-                setNewItem({ ...newItem, category: e.target.value })
-              }
-            />
-
-            <input
-              type="number"
-              placeholder="Stock Quantity"
-              value={newItem.stock}
-              onChange={(e) =>
-                setNewItem({ ...newItem, stock: e.target.value })
-              }
-            />
-
-            <input
-              type="number"
-              placeholder="Minimum Required"
-              value={newItem.min}
-              onChange={(e) =>
-                setNewItem({ ...newItem, min: e.target.value })
-              }
-            />
-
-            <div className="modal-actions">
-              <button onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button className="primary-btn" onClick={handleAddItem}>
-                Add
-              </button>
-            </div>
+          <div className="modal-actions">
+            <button onClick={handleAdd}>Save Item</button>
+            <button
+              className="cancel-btn"
+              onClick={() => setShowForm(false)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
+
+      {/* INVENTORY TABLE */}
+      <div className="inventory-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Reorder Level</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="empty-state">
+                  No inventory items found
+                </td>
+              </tr>
+            ) : (
+              filtered.map((item) => {
+                const status =
+                  item.quantity === 0
+                    ? "out"
+                    : item.quantity < item.reorder_level
+                    ? "low"
+                    : "ok";
+
+                return (
+                  <tr key={item.inventory_id}>
+                    <td>{item.product_name}</td>
+
+                    <td>
+                      <div className="stock-controls">
+                        <button
+                          onClick={() =>
+                            changeStock(item.inventory_id, -1)
+                          }
+                        >
+                          −
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() =>
+                            changeStock(item.inventory_id, 1)
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+
+                    <td>{item.reorder_level}</td>
+
+                    <td>
+                      <span className={`status ${status}`}>
+                        {status === "ok"
+                          ? "In Stock"
+                          : status === "low"
+                          ? "Low Stock"
+                          : "Out of Stock"}
+                      </span>
+                    </td>
+
+                    <td>
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                          handleDelete(item.inventory_id)
+                        }
+                      >
+                        ✖
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};
+
+export default Inventory;

@@ -7,6 +7,7 @@ const branchRoutes = require("./routes/branchRoutes");
 const franchiseRoutes = require("./routes/franchiseRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 
 /* ✅ ROUTES (ALL AFTER CORS) */
 app.use("/api/auth", authRoutes);
+app.use("/api/inventory", inventoryRoutes);
+
 app.use("/api/branches", branchRoutes);
 app.use("/api/franchises", franchiseRoutes);
 app.use("/api/expenses", expenseRoutes);

@@ -1,0 +1,172 @@
+/* ===== PAGE ===== */
+.expenses-page {
+  padding: 24px;
+  color: #e5e7eb;
+}
+
+/* CENTER CONTENT */
+.expenses-container {
+  max-width: 1100px;
+}
+
+/* ===== HEADER ===== */
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.expenses-header h1 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* ===== CONTROLS ===== */
+.expenses-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.expenses-controls input[type="month"] {
+  padding: 10px 12px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #e5e7eb;
+}
+
+.total {
+  font-size: 15px;
+  color: #cbd5f5;
+}
+
+/* ===== TABLE CARD ===== */
+.expenses-table {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ===== TABLE ===== */
+.expenses-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.expenses-table thead {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.expenses-table th {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: left;
+  border-bottom: 1px solid #1e293b;
+}
+
+.expenses-table td {
+  padding: 16px;
+  border-bottom: 1px solid #1e293b;
+  vertical-align: middle;
+}
+
+/* ===== BADGES ===== */
+.category-badge {
+  background: #1e293b;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.amount-badge {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* ===== EMPTY ===== */
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.modal {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 20px;
+  width: 380px;
+}
+
+.modal h2 {
+  margin-bottom: 12px;
+}
+
+.modal input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #e5e7eb;
+}
+
+/* ===== BUTTONS ===== */
+.primary-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  padding: 10px 16px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #1e293b;
+  color: #e5e7eb;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.inventory-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
