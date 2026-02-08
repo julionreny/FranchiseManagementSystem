@@ -1,0 +1,242 @@
+/* =========================
+   SALES PAGE LAYOUT
+========================= */
+.sales-page {
+  padding: 24px;
+  color: #f1f5f9;
+}
+
+/* =========================
+   HEADER
+========================= */
+.sales-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sales-header h1 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* =========================
+   FILTER BAR
+========================= */
+.sales-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.sales-filters input,
+.sales-filters select {
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.sales-filters input::placeholder {
+  color: #94a3b8;
+}
+
+.sales-filters button {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sales-filters button:hover {
+  background: #2563eb;
+}
+
+/* =========================
+   TABLE CARD
+========================= */
+.sales-table-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* =========================
+   TABLE
+========================= */
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sales-table thead {
+  background: #020617;
+}
+
+.sales-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.sales-table td {
+  padding: 14px 16px;
+  border-top: 1px solid #1e293b;
+  font-size: 14px;
+}
+
+/* =========================
+   ROW HOVER
+========================= */
+.sales-table tbody tr:hover {
+  background: #020617;
+}
+
+/* =========================
+   BADGES
+========================= */
+.role-badge {
+  background: #1e293b;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.status-inactive {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.amount-badge {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.action-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid #1e293b;
+  color: #cbd5e1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: #020617;
+}
+
+.icon-btn.edit {
+  color: #3b82f6;
+}
+
+.icon-btn.delete {
+  color: #ef4444;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.empty-sales {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+}
+
+/* =========================
+   MODAL
+========================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 22px;
+  width: 420px;
+}
+
+.modal h2 {
+  margin-bottom: 14px;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 10px;
+  border-radius: 8px;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid #1e293b;
+  color: #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background: #020617;
+}
+
+.primary-btn {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #2563eb;
+}

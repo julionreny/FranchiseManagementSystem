@@ -33,8 +33,8 @@ const Employee = () => {
   const fetchEmployees = async () => {
     try {
       const res = await getEmployees(branchId);
-      setEmployees(res.data);
-      setFilteredEmployees(res.data);
+      setEmployees(res.data || []);
+      setFilteredEmployees(res.data || []);
     } catch (err) {
       alert("Failed to load employees");
     }
@@ -66,8 +66,10 @@ const Employee = () => {
   const handleAdd = async () => {
     try {
       await addEmployee({ ...form, branch_id: branchId });
+
       alert("Employee added successfully");
       setShowForm(false);
+
       setForm({
         name: "",
         email: "",
@@ -78,6 +80,7 @@ const Employee = () => {
         experience: "",
         salary: "",
       });
+
       fetchEmployees();
     } catch (err) {
       alert("Failed to add employee");
@@ -128,6 +131,11 @@ const Employee = () => {
           {Object.keys(form).map((key) => (
             <input
               key={key}
+              type={
+                ["age", "experience", "salary"].includes(key)
+                  ? "number"
+                  : "text"
+              }
               placeholder={key.replace("_", " ").toUpperCase()}
               value={form[key]}
               onChange={(e) =>
@@ -170,7 +178,7 @@ const Employee = () => {
                   <td>{e.mobile_no}</td>
                   <td>
                     <span className="experience-badge">
-                      {e.experience} yrs
+                      {e.experience ? `${e.experience} yrs` : "0 yrs"}
                     </span>
                   </td>
                   <td>

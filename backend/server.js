@@ -7,8 +7,15 @@ const branchRoutes = require("./routes/branchRoutes");
 const franchiseRoutes = require("./routes/franchiseRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const employeeRoutes = require("./routes/employeeRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const salesRoutes = require("./routes/salesRoutes");
 
 const app = express();
+
+
+
+
+
 
 /* ✅ CORS — MUST COME BEFORE ALL ROUTES */
 app.use(
@@ -25,6 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 
 /* ✅ ROUTES (ALL AFTER CORS) */
 app.use("/api/auth", authRoutes);
+app.use("/api/inventory", inventoryRoutes);
+
 app.use("/api/branches", branchRoutes);
 app.use("/api/franchises", franchiseRoutes);
 app.use("/api/expenses", expenseRoutes);
@@ -36,3 +45,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
 });
+
+
+app.use("/api/sales", salesRoutes);

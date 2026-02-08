@@ -17,16 +17,51 @@ exports.getEmployees = async (req, res) => {
 
 // ADD employee
 exports.addEmployee = async (req, res) => {
-  const { branch_id, name, email, designation, mobile_no, salary } = req.body;
+  const {
+    branch_id,
+    name,
+    email,
+    age,
+    designation,
+    address,
+    mobile_no,
+    experience,
+    salary
+  } = req.body;
 
   try {
     await db.query(
-      `INSERT INTO employees (branch_id, name, email, designation, mobile_no, salary)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [branch_id, name, email, designation, mobile_no, salary]
+      `
+      INSERT INTO employees
+      (
+        branch_id,
+        name,
+        email,
+        age,
+        designation,
+        address,
+        mobile_no,
+        experience,
+        salary
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      `,
+      [
+        branch_id,
+        name,
+        email,
+        age,
+        designation,
+        address,
+        mobile_no,
+        experience,
+        salary
+      ]
     );
-    res.json({ message: "Employee added" });
+
+    res.status(201).json({ message: "Employee added successfully" });
   } catch (err) {
+    console.error("Add employee error:", err);
     res.status(500).json({ message: "Failed to add employee" });
   }
 };
