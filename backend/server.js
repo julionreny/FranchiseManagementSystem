@@ -12,11 +12,6 @@ const salesRoutes = require("./routes/salesRoutes");
 
 const app = express();
 
-
-
-
-
-
 /* ✅ CORS — MUST COME BEFORE ALL ROUTES */
 app.use(
   cors({
@@ -33,11 +28,11 @@ app.use(express.urlencoded({ extended: true }));
 /* ✅ ROUTES (ALL AFTER CORS) */
 app.use("/api/auth", authRoutes);
 app.use("/api/inventory", inventoryRoutes);
-
 app.use("/api/branches", branchRoutes);
 app.use("/api/franchises", franchiseRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/sales", salesRoutes);
 
 /* ✅ SERVER */
 const PORT = process.env.PORT || 5000;
@@ -45,6 +40,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
 });
-
-
-app.use("/api/sales", salesRoutes);
