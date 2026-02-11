@@ -1,4 +1,6 @@
 const db = require("../config/db");
+const { createNotification } = require("./notificationController");
+
 
 // GET employees by branch
 exports.getEmployees = async (req, res) => {
@@ -64,6 +66,14 @@ exports.addEmployee = async (req, res) => {
     console.error("Add employee error:", err);
     res.status(500).json({ message: "Failed to add employee" });
   }
+
+  await createNotification({
+  branch_id,
+  role_id: 2,
+  message: `👤 New Employee Added: ${name} (${designation})`,
+  type: "EMPLOYEE",
+});
+
 };
 
 // DELETE employee

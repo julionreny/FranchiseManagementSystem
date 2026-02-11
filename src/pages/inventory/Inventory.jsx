@@ -28,9 +28,12 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    fetchInventory();
-  }, []);
+    if (branchId) fetchInventory();
+  }, [branchId]);
 
+  /* =========================
+     ADD ITEM
+  ========================= */
   const handleAdd = async () => {
     if (!form.product_name) return alert("Product name required");
 
@@ -44,17 +47,30 @@ const Inventory = () => {
     fetchInventory();
   };
 
-  const handleDelete = async (id) => {
+  /* =========================
+     DELETE ITEM
+  ========================= */
+  const handleDelete = async (inventoryId) => {
     if (!window.confirm("Remove this item?")) return;
-    await deleteItem(id);
+    await deleteItem(inventoryId);
     fetchInventory();
   };
 
-  const changeStock = async (id, change) => {
-    await updateStock(id, change);
+  /* =========================
+     CHANGE STOCK (+ / -)
+  ========================= */
+  const changeStock = async (item, delta) => {
+    const newQuantity = Number(item.quantity) + delta;
+
+    if (newQuantity < 0) return;
+
+    await updateStock(item.inventory_id, newQuantity);
     fetchInventory();
   };
 
+  /* =========================
+     FILTER
+  ========================= */
   const filtered = items.filter((item) => {
     const matchSearch = item.product_name
       .toLowerCase()
@@ -75,7 +91,7 @@ const Inventory = () => {
         <button onClick={() => setShowForm(true)}>+ Add Item</button>
       </div>
 
-      {/* SEARCH + FILTER */}
+      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search inventory..."
@@ -83,6 +99,7 @@ const Inventory = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      {/* LOW STOCK FILTER */}
       <label className="low-stock-toggle">
         <input
           type="checkbox"
@@ -97,14 +114,14 @@ const Inventory = () => {
         <div className="inventory-modal">
           <h3>Add Inventory Item</h3>
 
-              <input
-                type="text"
-                placeholder="Product Name"
-                value={form.product_name}
-                onChange={(e) =>
-                  setForm({ ...form, product_name: e.target.value })
-                }
-              />
+          <input
+            type="text"
+            placeholder="Product Name"
+            value={form.product_name}
+            onChange={(e) =>
+              setForm({ ...form, product_name: e.target.value })
+            }
+          />
 
           <input
             type="number"
@@ -172,17 +189,13 @@ const Inventory = () => {
                     <td>
                       <div className="stock-controls">
                         <button
-                          onClick={() =>
-                            changeStock(item.inventory_id, -1)
-                          }
+                          onClick={() => changeStock(item, -1)}
                         >
                           −
                         </button>
                         <span>{item.quantity}</span>
                         <button
-                          onClick={() =>
-                            changeStock(item.inventory_id, 1)
-                          }
+                          onClick={() => changeStock(item, 1)}
                         >
                           +
                         </button>

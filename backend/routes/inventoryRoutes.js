@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   getInventory,
   addItem,
@@ -7,9 +8,16 @@ const {
   deleteItem,
 } = require("../controllers/inventoryController");
 
+/* GET INVENTORY */
 router.get("/:branchId", getInventory);
+
+/* ADD ITEM */
 router.post("/add", addItem);
-router.put("/update-stock", updateStock);
-router.delete("/:id", deleteItem);
+
+/* ✅ UPDATE QUANTITY (THIS WAS MISSING / MISMATCHED) */
+router.put("/update-quantity/:inventoryId", updateStock);
+
+/* DELETE ITEM */
+router.delete("/:inventoryId", deleteItem);
 
 module.exports = router;

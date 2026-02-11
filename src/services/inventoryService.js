@@ -2,14 +2,29 @@ import axios from "axios";
 
 const API = "http://localhost:5000/api/inventory";
 
+/* =========================
+   GET INVENTORY
+========================= */
 export const getInventory = (branchId) =>
   axios.get(`${API}/${branchId}`);
 
+/* =========================
+   ADD INVENTORY ITEM
+========================= */
 export const addItem = (data) =>
   axios.post(`${API}/add`, data);
 
-export const updateStock = (id, change) =>
-  axios.put(`${API}/update-stock`, { id, change });
+/* =========================
+   UPDATE STOCK (+ / -)
+========================= */
+export const updateStock = (inventoryId, quantity) =>
+  axios.put(
+    `${API}/update-quantity/${inventoryId}`,
+    { quantity }
+  );
 
-export const deleteItem = (id) =>
-  axios.delete(`${API}/${id}`);
+/* =========================
+   DELETE INVENTORY ITEM
+========================= */
+export const deleteItem = (inventoryId) =>
+  axios.delete(`${API}/${inventoryId}`);

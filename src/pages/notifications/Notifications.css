@@ -1,0 +1,43 @@
+.notifications-page {
+  padding: 20px;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clear-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.notification-list {
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.notif {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.notif span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.empty-state {
+  margin-top: 40px;
+  color: #94a3b8;
+  text-align: center;
+}
