@@ -11,6 +11,7 @@ const Sales = () => {
 
   const [sales, setSales] = useState([]);
   const [month, setMonth] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const [form, setForm] = useState({
@@ -40,9 +41,33 @@ const Sales = () => {
   }, [branchId, month]);
 
   /* =========================
+     SEARCH FILTER
+  ========================= */
+  const filteredSales = sales.filter((s) =>
+    s.product_name
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    s.customer_name
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    s.contact
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    s.payment_method
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    s.receipt_no
+      ?.toString()
+      .includes(searchTerm) ||
+    s.amount
+      ?.toString()
+      .includes(searchTerm)
+  );
+
+  /* =========================
      TOTAL CALCULATION
   ========================= */
-  const total = sales.reduce(
+  const total = filteredSales.reduce(
     (sum, s) => sum + Number(s.amount),
     0
   );
@@ -106,6 +131,14 @@ const Sales = () => {
           onChange={(e) => setMonth(e.target.value)}
         />
 
+        <input
+          type="text"
+          placeholder="Search sales..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="sales-search"
+        />
+
         <div className="total">
           {month
             ? `Total for ${month}: ₹${total}`
@@ -129,14 +162,14 @@ const Sales = () => {
           </thead>
 
           <tbody>
-            {sales.length === 0 ? (
+            {filteredSales.length === 0 ? (
               <tr>
                 <td colSpan="7" className="empty-sales">
                   No sales found
                 </td>
               </tr>
             ) : (
-              sales.map((s) => (
+              filteredSales.map((s) => (
                 <tr key={s.sale_id}>
                   <td className="receipt">{s.receipt_no}</td>
                   <td>{s.product_name}</td>

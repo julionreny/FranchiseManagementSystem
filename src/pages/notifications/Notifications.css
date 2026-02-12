@@ -41,3 +41,21 @@
   color: #94a3b8;
   text-align: center;
 }
+.notif {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.read-btn {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.read-btn:hover {
+  background: #27ae60;
+}

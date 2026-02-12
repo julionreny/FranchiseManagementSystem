@@ -29,6 +29,27 @@
   gap: 20px;
   margin-bottom: 20px;
 }
+/* Expense Search Bar */
+.expense-search {
+  width: 240px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #2c2c2c;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.expense-search::placeholder {
+  color: #888;
+}
+
+.expense-search:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
+}
 
 .expenses-controls input[type="month"] {
   padding: 10px 12px;

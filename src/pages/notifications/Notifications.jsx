@@ -3,6 +3,7 @@ import "./Notifications.css";
 import {
   getNotifications,
   clearNotifications,
+  deleteNotification,
 } from "../../services/notificationService";
 
 const Notifications = () => {
@@ -26,6 +27,13 @@ const Notifications = () => {
     setNotifications([]);
   };
 
+  const handleRead = async (id) => {
+    await deleteNotification(id);
+    setNotifications((prev) =>
+      prev.filter((n) => n.notification_id !== id)
+    );
+  };
+
   return (
     <div className="notifications-page">
       <div className="notifications-header">
@@ -43,11 +51,18 @@ const Notifications = () => {
       ) : (
         <ul className="notification-list">
           {notifications.map((n) => (
-            <li key={n.notification_id} className={`notif ${n.type}`}>
-              <p>{n.message}</p>
-              <span>
-                {new Date(n.created_at).toLocaleString()}
-              </span>
+            <li key={n.notification_id} className="notif">
+              <div className="notif-content">
+                <p>{n.message}</p>
+                <span>{new Date(n.created_at).toLocaleString()}</span>
+              </div>
+
+              <button
+                className="read-btn"
+                onClick={() => handleRead(n.notification_id)}
+              >
+                Read
+              </button>
             </li>
           ))}
         </ul>

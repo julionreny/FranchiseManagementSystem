@@ -7,3 +7,7 @@ export const getNotifications = (branchId) =>
 
 export const clearNotifications = (branchId) =>
   axios.delete(`${API}/clear/${branchId}`);
+
+/* READ (delete single notification) */
+export const deleteNotification = (id) =>
+  axios.delete(`${API}/${id}`);

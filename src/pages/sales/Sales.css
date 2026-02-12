@@ -240,3 +240,11 @@
 .primary-btn:hover {
   background: #2563eb;
 }
+.sales-search {
+  padding: 7px;
+  margin-left: 10px;
+  border-radius: 4px;
+  border: 1px solid #0ba455;
+  background: #111;
+  color: #fff;
+}

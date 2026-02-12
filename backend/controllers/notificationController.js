@@ -60,3 +60,18 @@ exports.clearNotifications = async (req, res) => {
     res.status(500).json({ message: "Failed to clear notifications" });
   }
 };
+exports.deleteNotification = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await db.query(
+      "DELETE FROM notifications WHERE notification_id = $1",
+      [id]
+    );
+
+    res.status(200).json({ message: "Notification removed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

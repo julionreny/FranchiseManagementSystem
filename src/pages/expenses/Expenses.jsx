@@ -11,6 +11,7 @@ export default function Expenses() {
 
   const [expenses, setExpenses] = useState([]);
   const [month, setMonth] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -35,9 +36,22 @@ export default function Expenses() {
   }, [branchId, month]);
 
   /* =========================
+     SEARCH FILTER
+  ========================= */
+  const filteredExpenses = expenses.filter((exp) =>
+    exp.expense_type
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    exp.description
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    exp.amount.toString().includes(searchTerm)
+  );
+
+  /* =========================
      TOTAL CALCULATION
   ========================= */
-  const total = expenses.reduce(
+  const total = filteredExpenses.reduce(
     (sum, e) => sum + Number(e.amount),
     0
   );
@@ -93,6 +107,14 @@ export default function Expenses() {
           onChange={(e) => setMonth(e.target.value)}
         />
 
+        <input
+          type="text"
+          placeholder="Search expenses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="expense-search"
+        />
+
         <div className="total">
           {month
             ? `Total for ${month}: ₹${total}`
@@ -113,14 +135,14 @@ export default function Expenses() {
           </thead>
 
           <tbody>
-            {expenses.length === 0 ? (
+            {filteredExpenses.length === 0 ? (
               <tr>
                 <td colSpan="4" className="empty-state">
                   No expenses found
                 </td>
               </tr>
             ) : (
-              expenses.map((exp) => (
+              filteredExpenses.map((exp) => (
                 <tr key={exp.expense_id}>
                   <td>
                     <span className="category-badge">
