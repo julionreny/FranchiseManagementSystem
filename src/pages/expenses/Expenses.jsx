@@ -12,6 +12,9 @@ export default function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [month, setMonth] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -36,17 +39,36 @@ export default function Expenses() {
   }, [branchId, month]);
 
   /* =========================
-     SEARCH FILTER
+     COMBINED FILTER LOGIC
   ========================= */
-  const filteredExpenses = expenses.filter((exp) =>
-    exp.expense_type
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase()) ||
-    exp.description
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase()) ||
-    exp.amount.toString().includes(searchTerm)
-  );
+  const filteredExpenses = expenses.filter((exp) => {
+    const expDate = new Date(exp.expense_date);
+
+    const matchesSearch =
+      exp.expense_type
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      exp.description
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      exp.amount.toString().includes(searchTerm);
+
+    const matchesType =
+      selectedType === "" || exp.expense_type === selectedType;
+
+    const matchesFrom =
+      !fromDate || expDate >= new Date(fromDate);
+
+    const matchesTo =
+      !toDate || expDate <= new Date(toDate);
+
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesFrom &&
+      matchesTo
+    );
+  });
 
   /* =========================
      TOTAL CALCULATION
@@ -99,26 +121,68 @@ export default function Expenses() {
         </button>
       </div>
 
-      {/* FILTERS */}
-      <div className="expenses-controls">
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-        />
+      {/* FILTER PANEL */}
+      <div className="filter-card">
+        <div className="filter-row">
+          <div className="filter-group">
+            <label>Month</label>
+            <input
+              type="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
+          </div>
 
-        <input
-          type="text"
-          placeholder="Search expenses..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="expense-search"
-        />
+          <div className="filter-group">
+            <label>Search</label>
+            <input
+              type="text"
+              placeholder="Search expenses..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        <div className="total">
-          {month
-            ? `Total for ${month}: ₹${total}`
-            : `Total: ₹${total}`}
+          <div className="filter-group">
+            <label>Expense Type</label>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              <option value="">All Types</option>
+              {[...new Set(expenses.map(e => e.expense_type))].map(type => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>From</label>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-group">
+            <label>To</label>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="filter-footer">
+          <div className="total-display">
+            {month
+              ? `Total for ${month}: ₹${total}`
+              : `Total: ₹${total}`}
+          </div>
         </div>
       </div>
 
