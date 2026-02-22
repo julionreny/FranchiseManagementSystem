@@ -9,6 +9,7 @@ import OwnerDashboard from "../pages/dashboard/OwnerDashboard";
 import ManagerDashboard from "../pages/dashboard/ManagerDashboard";
 import DashboardLayout from "../pages/dashboard/DashboardLayout";
 
+
 import Sales from "../pages/sales/Sales";
 import Inventory from "../pages/inventory/Inventory";
 import Employee from "../pages/employees/Employee";
@@ -31,13 +32,24 @@ const AppRoutes = () => (
 
     {/* MANAGER DASHBOARD + MODULES */}
     <Route path="/manager-dashboard" element={<DashboardLayout />}>
-      <Route index element={<ManagerDashboard />} />
-      <Route path="sales" element={<Sales />} />
-      <Route path="inventory" element={<Inventory />} />
-      <Route path="employees" element={<Employee />} />
-      <Route path="expenses" element={<Expenses />} />
-      <Route path="notifications" element={<Notifications />} />
-    </Route>
+
+  {/* dashboard page */}
+  <Route index element={<ManagerDashboard />} />
+
+  <Route path="dashboard" element={<ManagerDashboard />} />
+
+  {/* modules */}
+  <Route path="sales" element={<Sales />} />
+
+    <Route path="inventory" element={<Inventory />} />
+
+    <Route path="employees" element={<Employee />} />
+
+    <Route path="expenses" element={<Expenses />} />
+
+    <Route path="notifications" element={<Notifications />} />
+
+  </Route>
   </Routes>
 );
 

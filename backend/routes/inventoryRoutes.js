@@ -8,16 +8,15 @@ const {
   deleteItem,
 } = require("../controllers/inventoryController");
 
-/* GET INVENTORY */
+
 router.get("/:branchId", getInventory);
 
-/* ADD ITEM */
 router.post("/add", addItem);
 
-/* ✅ UPDATE QUANTITY (THIS WAS MISSING / MISMATCHED) */
 router.put("/update-quantity/:inventoryId", updateStock);
 
-/* DELETE ITEM */
-router.delete("/:inventoryId", deleteItem);
+/* THIS IS THE IMPORTANT ONE */
+router.delete("/:id", deleteItem);
+
 
 module.exports = router;

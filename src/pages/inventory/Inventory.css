@@ -11,6 +11,50 @@
   align-items: center;
   margin-bottom: 16px;
 }
+/* =========================
+   UNIT DROPDOWN
+========================= */
+
+.inventory-modal select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #1e1e2f;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.inventory-modal select:hover {
+  border-color: #5c6cff;
+}
+
+/* Focus Effect */
+.inventory-modal select:focus {
+  border-color: #5c6cff;
+  box-shadow: 0 0 0 2px rgba(92, 108, 255, 0.3);
+}
+
+/* Dropdown Arrow Styling */
+.inventory-modal select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5.516 7.548L10 12.032l4.484-4.484L16 8.064 10 14.064 4 8.064z'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 97%;
+  background-position-y: 50%;
+  padding-right: 30px;
+}
+
+/* Option Styling (limited browser support) */
+.inventory-modal select option {
+  background-color: #1e1e2f;
+  color: #ffffff;
+}
+
 
 .inventory-header h1 {
   font-size: 26px;
