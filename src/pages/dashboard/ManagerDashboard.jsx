@@ -88,23 +88,23 @@ const ManagerDashboard = () => {
 
   /* SALES CHART */
 
-  const fetchSalesChart = async () => {
+const fetchSalesChart = async () => {
 
-    try {
+  try {
 
-      const res = await axios.get(
-        `http://localhost:5000/api/dashboard/sales-last7days/${branchId}`
-      );
+    const res = await axios.get(
+      `http://localhost:5000/api/dashboard/sales-last-7-days/${branchId}`
+    );
 
-      setSalesData(res.data);
+    setSalesData(res.data);
 
-    } catch (err) {
+  } catch (err) {
 
-      console.error("Sales chart error:", err);
+    console.error("Sales chart error:", err);
 
-    }
+  }
 
-  };
+};
 
 
   /* EXPENSE BREAKDOWN */

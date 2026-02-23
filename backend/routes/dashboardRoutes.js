@@ -13,9 +13,8 @@ const {
 
 router.get("/summary/:branchId", getDashboardSummary);
 
-router.get("/sales-chart/:branchId", getSalesLast7Days);
+router.get("/sales-last-7-days/:branchId", getSalesLast7Days);
 
-router.get("/expense-chart/:branchId", getExpenseBreakdown);
-
+router.get("/expense-breakdown/:branchId", getExpenseBreakdown);
 
 module.exports = router;
