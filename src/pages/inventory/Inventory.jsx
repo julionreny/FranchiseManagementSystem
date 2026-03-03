@@ -11,6 +11,7 @@ const Inventory = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const branchId = user?.branch_id;
+  const isOwner = user?.role_id === 1;
 
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");

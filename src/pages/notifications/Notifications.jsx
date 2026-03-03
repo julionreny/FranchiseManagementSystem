@@ -61,7 +61,7 @@ const Notifications = () => {
                 className="read-btn"
                 onClick={() => handleRead(n.notification_id)}
               >
-                Read
+                Mark As Read
               </button>
             </li>
           ))}

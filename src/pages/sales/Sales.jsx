@@ -8,6 +8,7 @@ import "./Sales.css";
 const Sales = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const branchId = user?.branch_id;
+  const isOwner = user?.role_id === 1;
 
   const [sales, setSales] = useState([]);
   const [month, setMonth] = useState("");
@@ -102,6 +103,15 @@ const Sales = () => {
   };
 
   if (!branchId) {
+    if (isOwner) {
+      return (
+        <div className="empty-card">
+          <h2>Sales - Franchise Overview</h2>
+          <p>Branch managers manage sales for their branches.</p>
+          <p>Create branches and assign managers from the Dashboard.</p>
+        </div>
+      );
+    }
     return (
       <div className="empty-card">
         <h2>No Branch Assigned</h2>

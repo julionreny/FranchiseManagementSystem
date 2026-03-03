@@ -11,6 +11,13 @@ const API = axios.create({
 });
 
 /* =========================
+   GET BRANCHES BY FRANCHISE
+========================= */
+export const getBranchesByFranchise = (franchiseId) => {
+  return API.get(`/franchise/${franchiseId}`);
+};
+
+/* =========================
    CREATE BRANCH
 ========================= */
 export const createBranch = (branchData) => {

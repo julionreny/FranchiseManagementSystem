@@ -1,5 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import OwnerExpense from "../pages/owner/OwnerExpense";
+
+
+
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import OwnerRegister from "../pages/auth/OwnerRegister";
@@ -28,6 +32,11 @@ const AppRoutes = () => (
     {/* OWNER DASHBOARD */}
     <Route path="/owner-dashboard" element={<DashboardLayout />}>
       <Route index element={<OwnerDashboard />} />
+      <Route path="sales" element={<Sales />} />
+      <Route path="inventory" element={<Inventory />} />
+      <Route path="employees" element={<Employee />} />
+      <Route path="expenses" element={<OwnerExpense />} />
+      <Route path="notifications" element={<Notifications />} />
     </Route>
 
     {/* MANAGER DASHBOARD + MODULES */}

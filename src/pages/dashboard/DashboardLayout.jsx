@@ -28,45 +28,47 @@ const DashboardLayout = () => {
   };
 
 
-  const menu = [
+  // Build menu based on user role
+  const getMenu = () => {
+    const basePrefix = user?.role_id === 1 ? "/owner-dashboard" : "/manager-dashboard";
+    
+    const baseMenu = [
+      {
+        name: "Dashboard",
+        icon: <FiHome />,
+        path: `${basePrefix}`
+      },
+      {
+        name: "Sales",
+        icon: <FiShoppingCart />,
+        path: `${basePrefix}/sales`
+      },
+      {
+        name: "Inventory",
+        icon: <FiBox />,
+        path: `${basePrefix}/inventory`
+      },
+      {
+        name: "Employees",
+        icon: <FiUsers />,
+        path: `${basePrefix}/employees`
+      },
+      {
+        name: "Expenses",
+        icon: <FiDollarSign />,
+        path: `${basePrefix}/expenses`
+      },
+      {
+        name: "Notifications",
+        icon: <FiBell />,
+        path: `${basePrefix}/notifications`
+      }
+    ];
 
-    {
-      name: "Dashboard",
-      icon: <FiHome />,
-      path: "/manager-dashboard/dashboard"
-    },
+    return baseMenu;
+  };
 
-    {
-      name: "Sales",
-      icon: <FiShoppingCart />,
-      path: "/manager-dashboard/sales"
-    },
-
-    {
-      name: "Inventory",
-      icon: <FiBox />,
-      path: "/manager-dashboard/inventory"
-    },
-
-    {
-      name: "Employees",
-      icon: <FiUsers />,
-      path: "/manager-dashboard/employees"
-    },
-
-    {
-      name: "Expenses",
-      icon: <FiDollarSign />,
-      path: "/manager-dashboard/expenses"
-    },
-
-    {
-      name: "Notifications",
-      icon: <FiBell />,
-      path: "/manager-dashboard/notifications"
-    }
-
-  ];
+  const menu = getMenu();
 
 
   return (
@@ -93,8 +95,10 @@ const DashboardLayout = () => {
 
               className={
                 location.pathname === item.path ||
+                (location.pathname === "/owner-dashboard" &&
+                item.path === "/owner-dashboard") ||
                 (location.pathname === "/manager-dashboard" &&
-                item.path === "/manager-dashboard/dashboard")
+                item.path === "/manager-dashboard")
                 ? "menu-item active"
                 : "menu-item"
               }
