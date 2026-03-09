@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: true,
     credentials: true,
   })
 );
@@ -35,6 +35,8 @@ const salesRoutes = require("./routes/salesRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const ownerExpenseRoutes = require("./routes/ownerExpenseRoutes");
+const ownerInventoryRoutes = require("./routes/ownerInventoryRoutes");
+const ownerSalesRoutes = require("./routes/ownerSalesRoutes");
 
 /* =========================
    ROUTES USE
@@ -48,6 +50,8 @@ app.use("/api/employees", employeeRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/owner-expenses", ownerExpenseRoutes);
+app.use("/api/owner-inventory", ownerInventoryRoutes);
+app.use("/api/owner-sales", ownerSalesRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 

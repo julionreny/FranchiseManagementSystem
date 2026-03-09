@@ -1,249 +1,171 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StatCard from "../../components/dashboard/StatCard";
-import { createBranch, getBranchesByFranchise } from "../../services/branchService";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from "recharts";
 import { getOwnerFranchise } from "../../services/franchiseService";
-import "./Dashboard.css";
+import { getOwnerStats, getOwnerBranchTrend } from "../../services/dashboardService";
+import "./OwnerDashboard.css";
 
 const OwnerDashboard = () => {
   const navigate = useNavigate();
-
   const [franchise, setFranchise] = useState(null);
-  const [branches, setBranches] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [branchName, setBranchName] = useState("");
-  const [location, setLocation] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
+  const [stats, setStats] = useState(null);
+  const [areaData, setAreaData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  /* =========================
-     FETCH BRANCHES
-     ========================= */
-  const fetchBranches = async (franchiseId) => {
-    try {
-      console.log("📍 Fetching branches for franchise:", franchiseId);
-      const res = await getBranchesByFranchise(franchiseId);
-      console.log("✅ Branches fetched:", res.data);
-      setBranches(res.data || []);
-    } catch (err) {
-      console.error("❌ Failed to fetch branches:", err);
-      setBranches([]);
-    }
-  };
+  const PIE_COLORS = ["#14532d", "#475569", "#ca8a04", "#7f1d1d", "#0f766e"];
 
-  /* =========================
-     AUTH + FETCH FRANCHISE + BRANCHES
-     ========================= */
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-
     if (!storedUser) {
       navigate("/login");
       return;
     }
 
     const user = JSON.parse(storedUser);
-    console.log("👤 User logged in:", user);
-
     if (user.role_id !== 1) {
       alert("Unauthorized access");
       navigate("/login");
       return;
     }
 
-    // If we have franchise_id from login, use it directly
-    if (user.franchise_id) {
-      console.log("✅ franchise_id from login:", user.franchise_id);
-      // Fetch franchise details and branches
-      getOwnerFranchise(user.user_id)
-        .then((res) => {
-          console.log("✅ Franchise details:", res.data);
-          setFranchise(res.data);
-          fetchBranches(user.franchise_id);
-        })
-        .catch((err) => {
-          console.error("❌ Failed to fetch franchise:", err);
-          alert("Failed to load franchise details");
-        });
-    } else {
-      console.log("⚠️  No franchise_id from login, fetching franchise...");
-      // Fallback: fetch franchise to get franchise_id
-      getOwnerFranchise(user.user_id)
-        .then((res) => {
-          console.log("✅ Franchise details (fallback):", res.data);
-          setFranchise(res.data);
-          fetchBranches(res.data.franchise_id);
-        })
-        .catch((err) => {
-          console.error("❌ Failed to fetch franchise (fallback):", err);
-          alert("Failed to load franchise details");
-        });
-    }
+    setLoading(true);
+    getOwnerFranchise(user.user_id)
+      .then((res) => {
+        setFranchise(res.data);
+        if (res.data?.franchise_id) {
+          const fid = res.data.franchise_id;
+          return Promise.all([
+            getOwnerStats(fid),
+            getOwnerBranchTrend(fid)
+          ]);
+        }
+      })
+      .then((results) => {
+        if (results) {
+          const [s, t] = results;
+          setStats(s.data);
+          
+          // Transform trend data for area chart
+          const grouped = t.data.reduce((acc, curr) => {
+            if (!acc[curr.name]) acc[curr.name] = { name: curr.name };
+            acc[curr.name][curr.branch_name] = Number(curr.revenue);
+            return acc;
+          }, {});
+          setAreaData(Object.values(grouped));
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Dashboard error:", err);
+        setLoading(false);
+      });
   }, [navigate]);
 
-  /* =========================
-     CREATE BRANCH
-     ========================= */
-  const handleCreateBranch = async () => {
-    if (!branchName || !location) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    try {
-      const res = await createBranch({
-        franchise_id: franchise.franchise_id,
-        branch_name: branchName,
-        location
-      });
-
-      console.log("✅ Branch created:", res.data);
-      setInviteCode(res.data.invite_code);
-      alert("Branch created successfully!");
-
-      // Reset form
-      setShowForm(false);
-      setBranchName("");
-      setLocation("");
-
-      // Refresh branches list after a short delay
-      setTimeout(() => {
-        fetchBranches(franchise.franchise_id);
-      }, 500);
-    } catch (err) {
-      console.error("❌ Failed to create branch:", err);
-      alert("Failed to create branch");
-    }
-  };
-
-  /* =========================
-     LOADING STATE
-     ========================= */
-  if (!franchise) {
-    return <h3>Loading franchise details...</h3>;
-  }
-
   return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">Owner Dashboard</h1>
+    <div className="owner-dashboard-wrapper">
+      <h1 className="owner-dashboard-title">
+        Franchise Owner Strategic Dashboard
+      </h1>
 
-      {/* STATS */}
-      <div className="stats-grid">
-        <StatCard title="Franchise Name" value={franchise.franchise_name} />
-        <StatCard title="Location" value={franchise.location} />
-        <StatCard title="Total Branches" value={branches.length} />
-        <StatCard title="Status" value={franchise.status || "ACTIVE"} />
-      </div>
-
-      {/* ADD BRANCH BUTTON */}
-      <div style={{ marginTop: "30px", marginBottom: "30px" }}>
-        <button className="auth-btn" onClick={() => setShowForm(!showForm)}>
-          ➕ Add New Branch
-        </button>
-      </div>
-
-      {/* CREATE BRANCH FORM */}
-      {showForm && (
-        <div className="auth-card" style={{ marginTop: "20px", marginBottom: "20px" }}>
-          <h3>Create New Branch</h3>
-
-          <input
-            className="auth-input"
-            placeholder="Branch Name"
-            value={branchName}
-            onChange={(e) => setBranchName(e.target.value)}
-          />
-
-          <input
-            className="auth-input"
-            placeholder="Location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-
-          <button className="auth-btn" onClick={handleCreateBranch}>
-            Create Branch
-          </button>
-        </div>
-      )}
-
-      {/* INVITE CODE */}
-      {inviteCode && (
-        <div className="success-msg" style={{ marginTop: "20px", marginBottom: "30px" }}>
-          <strong>✅ Branch Manager Invite Code:</strong>
-          <p style={{ fontSize: "18px", letterSpacing: "2px", fontWeight: "bold", color: "#22c55e" }}>
-            {inviteCode}
-          </p>
-          <small>Share this code with your branch manager to register</small>
-        </div>
-      )}
-
-      {/* BRANCHES TABLE */}
-      {branches.length > 0 && (
-        <div style={{ marginTop: "30px" }}>
-          <h2>Branches ({branches.length})</h2>
-          <div className="expenses-table" style={{ marginTop: "20px" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Branch Name</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Manager Assigned</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {branches.map((branch) => (
-                  <tr key={branch.branch_id}>
-                    <td>{branch.branch_name}</td>
-                    <td>{branch.location}</td>
-                    <td>
-                      <span
-                        style={{
-                          background: branch.status === "ACTIVE" 
-                            ? "rgba(34, 197, 94, 0.15)" 
-                            : "rgba(239, 68, 68, 0.15)",
-                          color: branch.status === "ACTIVE" 
-                            ? "#22c55e" 
-                            : "#ef4444",
-                          padding: "6px 12px",
-                          borderRadius: "999px",
-                          fontSize: "12px",
-                          fontWeight: "500"
-                        }}
-                      >
-                        {branch.status}
-                      </span>
-                    </td>
-                    <td>
-                      {branch.is_code_used ? (
-                        <span style={{ color: "#22c55e" }}>✅ Assigned</span>
-                      ) : (
-                        <span style={{ color: "#94a3b8" }}>⏳ Pending</span>
-                      )}
-                    </td>
-                    <td>
-                      {new Date(branch.created_at).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* STAT CARDS */}
+      <div className="owner-stats-grid">
+        <div className="owner-stat-card green">
+          <h4>Total System Revenue</h4>
+          <div className="owner-stat-value">
+            <span>₹{(stats?.totalRevenue || 0).toLocaleString()}</span>
+            <div className="mini-chart">📈</div>
           </div>
         </div>
-      )}
 
-      {/* EMPTY STATE */}
-      {branches.length === 0 && !showForm && (
-        <div style={{ 
-          textAlign: "center", 
-          padding: "40px", 
-          color: "#94a3b8",
-          marginTop: "30px"
-        }}>
-          <p>No branches created yet. Click "Add New Branch" to get started!</p>
+        <div className="owner-stat-card slate">
+          <h4>Active Locations</h4>
+          <div className="owner-stat-value">
+            <span>
+              {stats?.activeBranches || 0}/{stats?.totalBranches || 0} <span className="stat-subtext">operating</span>
+            </span>
+            <div className="circle-progress">{stats?.totalBranches > 0 ? Math.round((stats.activeBranches/stats.totalBranches)*100) : 0}%</div>
+          </div>
         </div>
-      )}
+
+        <div className="owner-stat-card yellow">
+          <h4>Operating Efficiency Score</h4>
+          <div className="owner-stat-value">
+            <span>{stats?.efficiencyScore || 0}%</span>
+            <svg
+              className="mini-sparkline"
+              viewBox="0 0 60 30"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+            >
+              <path d="M0,25 L10,20 L20,22 L30,10 L40,15 L50,5 L60,8" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="owner-stat-card red">
+          <h4>Total Employees (System)</h4>
+          <div className="owner-stat-value">
+            <span>{stats?.totalEmployees || 0}</span>
+            <div className="mini-chart">●</div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* CHARTS */}
+      <div className="owner-chart-grid">
+        {/* AREA CHART */}
+        <div className="owner-chart-box" style={{ gridColumn: "span 2" }}>
+          <div className="owner-chart-header">
+            <h3 className="owner-chart-title">Multi-Branch Performance (Last 30 Days)</h3>
+            <span className="owner-chart-total">Total: ₹{(stats?.totalRevenue || 0).toLocaleString()}</span>
+          </div>
+
+          <ResponsiveContainer width="100%" height={320}>
+            <AreaChart data={areaData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+              <defs>
+                {/* Simplified gradients */}
+                <linearGradient id="colorMain" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={true} />
+              <XAxis dataKey="name" stroke="#94a3b8" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 10 }} />
+              <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ backgroundColor: "#1e293b", borderColor: "#334155" }}
+                itemStyle={{ color: "#e2e8f0" }}
+              />
+              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: "12px", color: "#e2e8f0" }} />
+              {areaData.length > 0 && Object.keys(areaData[0]).filter(k => k !== 'name').map((branch, i) => (
+                <Area 
+                  key={branch} 
+                  type="monotone" 
+                  dataKey={branch} 
+                  name={branch} 
+                  stroke={PIE_COLORS[i % PIE_COLORS.length]} 
+                  fillOpacity={0.2} 
+                  fill={PIE_COLORS[i % PIE_COLORS.length]} 
+                />
+              ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 };

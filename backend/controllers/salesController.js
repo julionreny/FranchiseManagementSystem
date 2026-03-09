@@ -87,6 +87,15 @@ exports.addSale = async (req, res) => {
       ]
     );
 
+    // Notify owner if sale is significant (> 10000)
+    if (amount >= 10000) {
+      await db.query(
+        `INSERT INTO notifications (branch_id, role_id, message, type)
+         VALUES ($1, 1, $2, 'SALE')`,
+        [branch_id, `High-value sale of ₹${amount} recorded for ${product_name}.`, 'SUCCESS']
+      );
+    }
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);

@@ -1,0 +1,201 @@
+/* =========================
+   MAIN CONTAINER
+========================= */
+.owner-dashboard-wrapper {
+  padding: 24px;
+  background-color: #0b1120;
+  min-height: 100vh;
+  color: #f1f5f9;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* =========================
+   TITLE
+========================= */
+.owner-dashboard-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* =========================
+   STAT CARDS GRID
+========================= */
+.owner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 1.5fr repeat(2, 1fr); /* Adjust for 5 cards or let it wrap */
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* For better layout with 5 cards, let's use a flexible grid */
+.owner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* =========================
+   STAT CARD BASE
+========================= */
+.owner-stat-card {
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.owner-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.owner-stat-card.green {
+  background: linear-gradient(135deg, #115e59 0%, #064e3b 100%);
+}
+
+.owner-stat-card.slate {
+  background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+}
+
+.owner-stat-card.yellow {
+  background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+}
+
+.owner-stat-card.red {
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+}
+
+.owner-stat-card.purple {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.ml-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+}
+
+/* =========================
+   STAT TEXT
+========================= */
+.owner-stat-card h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  opacity: 0.9;
+  z-index: 1;
+}
+
+.owner-stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.mini-chart {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.stat-subtext {
+  font-size: 14px;
+  opacity: 0.8;
+  font-weight: normal;
+}
+
+.circle-progress {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.mini-sparkline {
+  width: 60px;
+  height: 30px;
+}
+
+/* =========================
+   CHART GRID
+========================= */
+.owner-chart-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* =========================
+   CHART BOX
+========================= */
+.owner-chart-box {
+  background: #111827;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.owner-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.owner-chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.owner-chart-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1200px) {
+  .owner-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .owner-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}

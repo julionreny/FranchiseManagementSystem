@@ -129,6 +129,14 @@ exports.updateStock = async (req, res) => {
         message: `⚠️ Low stock: ${item.product_name} (${item.quantity} ${item.unit})`,
       });
 
+      // Also notify owner (role_id = 1)
+      await createNotification({
+        branch_id: item.branch_id,
+        role_id: 1,
+        type: "LOW_STOCK",
+        message: `⚠️ Low stock alert at ${item.branch_id}: ${item.product_name} is down to ${item.quantity} ${item.unit}.`,
+      });
+
     }
 
     res.json(item);

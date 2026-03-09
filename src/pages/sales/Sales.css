@@ -26,22 +26,36 @@
 ========================= */
 .sales-filters {
   display: flex;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(145deg, #141414, #1b1b1b);
+  border: 1px solid #262626;
+  border-radius: 8px;
+  flex-wrap: wrap;
 }
 
 .sales-filters input,
 .sales-filters select {
-  background: #020617;
-  border: 1px solid #1e293b;
+  background: #0f0f0f;
+  border: 1px solid #2c2c2c;
   color: #e5e7eb;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   outline: none;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.sales-filters input:focus,
+.sales-filters select:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
 .sales-filters input::placeholder {
-  color: #94a3b8;
+  color: #888;
 }
 
 .sales-filters button {
@@ -49,12 +63,25 @@
   border: none;
   color: white;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
 }
 
 .sales-filters button:hover {
   background: #2563eb;
+}
+
+.sales-filters .total {
+  margin-left: auto;
+  font-size: 16px;
+  font-weight: 600;
+  background: #0f0f0f;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid #2c2c2c;
+  color: #4caf50;
 }
 
 /* =========================
@@ -247,4 +274,12 @@
   border: 1px solid #0ba455;
   background: #111;
   color: #fff;
+}
+/* =========================
+   TOTAL DISPLAY
+========================= */
+.total {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e7eb;
 }

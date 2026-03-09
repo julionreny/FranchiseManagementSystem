@@ -68,6 +68,13 @@ router.post("/", async (req, res) => {
       [branch_id, expense_type, amount, expense_date, description || ""]
     );
 
+    // Notify owner (role_id = 1) about new expense
+    await db.query(
+      `INSERT INTO notifications (branch_id, role_id, message, type)
+       VALUES ($1, 1, $2, 'EXPENSE')`,
+      [branch_id, `New expense of ₹${amount} recorded at branch ${branch_id}: ${expense_type}.`]
+    );
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error("Add expense error:", error);

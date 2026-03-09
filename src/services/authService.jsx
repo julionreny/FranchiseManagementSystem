@@ -21,3 +21,9 @@ export const registerManager = (data) =>
 
 export const loginUser = (data) =>
   API.post("/login", data);
+
+export const forgotPassword = (email) =>
+  API.post("/forgot-password", { email });
+
+export const resetPassword = (data) =>
+  API.post("/reset-password", data);

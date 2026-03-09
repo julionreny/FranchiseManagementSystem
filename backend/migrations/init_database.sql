@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS branches (
   branch_name VARCHAR(255) NOT NULL,
   location VARCHAR(255) NOT NULL,
   manager_id INTEGER REFERENCES users(user_id),
+  manager_email VARCHAR(255),
   manager_invite_code VARCHAR(10) UNIQUE,
   is_code_used BOOLEAN DEFAULT FALSE,
   status VARCHAR(50) DEFAULT 'ACTIVE',

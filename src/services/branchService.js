@@ -24,6 +24,18 @@ export const createBranch = (branchData) => {
   return API.post("/create", branchData);
 };
 
+export const updateBranch = (branchId, branchData) => {
+  return API.put(`/update/${branchId}`, branchData);
+};
+
+export const deleteBranch = (branchId) => {
+  return API.delete(`/delete/${branchId}`);
+};
+
+export const resetInviteCode = (branchId) => {
+  return API.post(`/reset-invite/${branchId}`);
+};
+
 /* =========================
    (FUTURE) GET BRANCHES
 ========================= */

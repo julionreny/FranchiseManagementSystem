@@ -72,6 +72,12 @@ if (res.data.user.role_id === 1) {
           </button>
 
           <div className="auth-link">
+            <span onClick={() => navigate("/forgot-password")}>
+              Forgot Password?
+            </span>
+          </div>
+
+          <div className="auth-link">
             <span onClick={() => navigate("/register")}>
               New user? Register
             </span>

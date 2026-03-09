@@ -14,6 +14,14 @@ export const getSalesChart =
 axios.get(`${API}/sales-chart/${branchId}`);
 
 
-export const getExpenseChart =
-(branchId) =>
-axios.get(`${API}/expense-chart/${branchId}`);
+export const getOwnerStats = (franchiseId) =>
+  axios.get(`${API}/owner-stats/${franchiseId}`);
+
+export const getOwnerBranchTrend = (franchiseId) =>
+  axios.get(`${API}/owner-branch-trend/${franchiseId}`);
+
+export const getOwnerBranchPerformance = (franchiseId) =>
+  axios.get(`${API}/owner-branch-performance/${franchiseId}`);
+
+export const getSalesForecast = (franchiseId) =>
+  axios.get(`${API}/forecast/${franchiseId}`);

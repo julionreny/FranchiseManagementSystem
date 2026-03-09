@@ -1,7 +1,7 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sendOtpEmail = require("../utils/emailService");
+const { sendOtpEmail, sendResetTokenEmail } = require("../utils/emailService");
 const generateOtp = require("../utils/otp");
 
 /* =========================
@@ -175,6 +175,13 @@ exports.registerManager = async (req, res) => {
       [userRes.rows[0].user_id, branchRes.rows[0].branch_id]
     );
 
+    // Notify owner (role_id = 1) about new manager
+    await pool.query(
+      `INSERT INTO notifications (branch_id, role_id, message, type)
+       VALUES ($1, 1, $2, 'SUCCESS')`,
+      [branchRes.rows[0].branch_id, `Manager ${name} has registered for branch "${branchRes.rows[0].branch_name}".`]
+    );
+
     res.json({ message: "Branch Manager Registered Successfully" });
   } catch (err) {
     console.error("MANAGER REGISTER ERROR:", err);
@@ -186,10 +193,12 @@ exports.registerManager = async (req, res) => {
    LOGIN
 ========================= */
 exports.loginUser = async (req, res) => {
-  const email = req.body.email.toLowerCase().trim();
-  const { password } = req.body;
-
   try {
+    if (!req.body || !req.body.email || !req.body.password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+    const email = req.body.email.toLowerCase().trim();
+    const { password } = req.body;
     const userRes = await pool.query(
       "SELECT * FROM users WHERE email=$1",
       [email]
@@ -229,5 +238,63 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Login failed" });
+  }
+};
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const userRes = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (userRes.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = generateOtp(); // Reusing the 6-digit generator
+    const expiry = new Date(Date.now() + 15 * 60000); // 15 minutes
+
+    await pool.query(
+      "UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3",
+      [token, expiry, email]
+    );
+
+    await sendResetTokenEmail(email, token);
+    res.json({ message: "Reset token sent to your email" });
+  } catch (err) {
+    console.error("FORGOT PASSWORD ERROR:", err);
+    res.status(500).json({ message: "Failed to process forgot password" });
+  }
+};
+
+/* =========================
+   RESET PASSWORD
+========================= */
+exports.resetPassword = async (req, res) => {
+  const { email, token, newPassword } = req.body;
+
+  try {
+    const userRes = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND reset_token = $2 AND reset_token_expiry > NOW()",
+      [email, token]
+    );
+
+    if (userRes.rows.length === 0) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      "UPDATE users SET password = $1, reset_token = NULL, reset_token_expiry = NULL WHERE email = $2",
+      [hashedPassword, email]
+    );
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("RESET PASSWORD ERROR:", err);
+    res.status(500).json({ message: "Password reset failed" });
   }
 };
