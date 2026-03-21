@@ -1,6 +1,3 @@
-
-
-
 const express = require("express");
 const router = express.Router();
 
@@ -8,22 +5,27 @@ const {
   getNotifications,
   clearNotifications,
   deleteNotification,
-  getNotificationsByFranchise,
+  getOwnerNotifications
 } = require("../controllers/notificationController");
 
-/* GET notifications by franchise (Owner) */
-router.get("/franchise/:franchiseId", getNotificationsByFranchise);
+/* =========================
+   OWNER NOTIFICATIONS (ALL BRANCHES)
+========================= */
+router.get("/owner/:franchiseId", getOwnerNotifications);
 
-/* GET notifications by branch (Manager) — legacy */
+/* =========================
+   MANAGER NOTIFICATIONS (BRANCH)
+========================= */
 router.get("/:branchId", getNotifications);
 
-/* DELETE single notification */
+/* =========================
+   CLEAR ALL NOTIFICATIONS
+========================= */
 router.delete("/clear/:branchId", clearNotifications);
 
-/* CLEAR ALL */
+/* =========================
+   DELETE SINGLE NOTIFICATION
+========================= */
 router.delete("/:id", deleteNotification);
 
 module.exports = router;
-
-
-

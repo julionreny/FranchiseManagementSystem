@@ -6,16 +6,19 @@ import {
 import "./Expenses.css";
 
 export default function Expenses() {
+
   const user = JSON.parse(localStorage.getItem("user"));
   const branchId = user?.branch_id;
 
   const [expenses, setExpenses] = useState([]);
   const [month, setMonth] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [prioritySort, setPrioritySort] = useState("date");
+
   const [showModal, setShowModal] = useState(false);
+
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
 
   const [formData, setFormData] = useState({
     expense_type: "",
@@ -24,67 +27,57 @@ export default function Expenses() {
     description: "",
   });
 
-  /* =========================
-     FETCH EXPENSES (MONTH-WISE)
-  ========================= */
   useEffect(() => {
     if (!branchId) return;
-
-    const fetchExpenses = async () => {
-      const data = await getExpensesByBranch(branchId, month);
-      setExpenses(data || []);
-    };
-
     fetchExpenses();
   }, [branchId, month]);
 
-  /* =========================
-     COMBINED FILTER LOGIC
-  ========================= */
-  const filteredExpenses = expenses.filter((exp) => {
-    const expDate = new Date(exp.expense_date);
+  const fetchExpenses = async () => {
+    const data = await getExpensesByBranch(branchId, month);
+    setExpenses(data || []);
+  };
 
-    const matchesSearch =
-      exp.expense_type
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      exp.description
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      exp.amount.toString().includes(searchTerm);
+  /* FILTER */
 
-    const matchesType =
-      selectedType === "" || exp.expense_type === selectedType;
+  let filteredExpenses = expenses.filter((exp) =>
+    exp.expense_type
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
-    const matchesFrom =
-      !fromDate || expDate >= new Date(fromDate);
+  /* SORT */
 
-    const matchesTo =
-      !toDate || expDate <= new Date(toDate);
+  if (prioritySort === "priority") {
+    const priorityOrder = { high: 1, medium: 2, low: 3 };
 
-    return (
-      matchesSearch &&
-      matchesType &&
-      matchesFrom &&
-      matchesTo
+    filteredExpenses.sort(
+      (a, b) =>
+        (priorityOrder[a.priority] || 4) -
+        (priorityOrder[b.priority] || 4)
     );
-  });
+  } else {
+    filteredExpenses.sort(
+      (a, b) =>
+        new Date(b.expense_date) -
+        new Date(a.expense_date)
+    );
+  }
 
-  /* =========================
-     TOTAL CALCULATION
-  ========================= */
   const total = filteredExpenses.reduce(
     (sum, e) => sum + Number(e.amount),
     0
   );
 
-  /* =========================
-     ADD EXPENSE
-  ========================= */
+  /* ADD EXPENSE */
+
   const handleAddExpense = async () => {
-    await addExpense({ ...formData, branch_id: branchId });
+    await addExpense({
+      ...formData,
+      branch_id: branchId,
+    });
 
     setShowModal(false);
+
     setFormData({
       expense_type: "",
       amount: "",
@@ -92,24 +85,27 @@ export default function Expenses() {
       description: "",
     });
 
-    const data = await getExpensesByBranch(branchId, month);
-    setExpenses(data || []);
+    fetchExpenses();
   };
 
-  /* =========================
-     NO BRANCH CASE
-  ========================= */
+  /* OPEN BILL */
+
+  const openInvoice = (expense) => {
+    setSelectedExpense(expense);
+    setShowInvoice(true);
+  };
+
   if (!branchId) {
     return (
       <div className="empty-card">
         <h2>No Branch Assigned</h2>
-        <p>Only branch managers can view expenses.</p>
       </div>
     );
   }
 
   return (
-    <div className="expenses-page">
+    <div className="manager-expenses-page">
+
       {/* HEADER */}
       <div className="expenses-header">
         <h1>Expenses</h1>
@@ -121,11 +117,12 @@ export default function Expenses() {
         </button>
       </div>
 
-      {/* FILTER PANEL */}
+      {/* FILTER BAR */}
       <div className="filter-card">
         <div className="filter-row">
+
           <div className="filter-group">
-            <label>Month</label>
+            <label>Select Month</label>
             <input
               type="month"
               value={month}
@@ -137,51 +134,34 @@ export default function Expenses() {
             <label>Search</label>
             <input
               type="text"
-              placeholder="Search expenses..."
+              placeholder="Search expense..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) =>
+                setSearchTerm(e.target.value)
+              }
             />
           </div>
 
           <div className="filter-group">
-            <label>Expense Type</label>
+            <label>Sort</label>
             <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
+              value={prioritySort}
+              onChange={(e) =>
+                setPrioritySort(e.target.value)
+              }
             >
-              <option value="">All Types</option>
-              {[...new Set(expenses.map(e => e.expense_type))].map(type => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <option value="date">By Date</option>
+              <option value="priority">
+                By Priority
+              </option>
             </select>
           </div>
 
-          <div className="filter-group">
-            <label>From</label>
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-            />
-          </div>
-
-          <div className="filter-group">
-            <label>To</label>
-            <input
-              type="date"
-              value={toDate}
-              onChange={(e) => setToDate(e.target.value)}
-            />
-          </div>
         </div>
 
         <div className="filter-footer">
           <div className="total-display">
-            {month
-              ? `Total for ${month}: ₹${total}`
-              : `Total: ₹${total}`}
+            Total ₹{total.toLocaleString("en-IN")}
           </div>
         </div>
       </div>
@@ -194,37 +174,41 @@ export default function Expenses() {
               <th>Type</th>
               <th>Amount</th>
               <th>Date</th>
+              <th>Priority</th>
               <th>Description</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredExpenses.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="empty-state">
-                  No expenses found
+            {filteredExpenses.map((exp) => (
+              <tr
+                key={exp.expense_id}
+                style={{ cursor: "pointer" }}
+                onClick={() => openInvoice(exp)}
+              >
+                <td>{exp.expense_type}</td>
+
+                <td>
+                  ₹{Number(exp.amount).toLocaleString("en-IN")}
                 </td>
+
+                <td>
+                  {new Date(
+                    exp.expense_date
+                  ).toLocaleDateString()}
+                </td>
+
+                <td>
+                  <span
+                    className={`priority ${exp.priority}`}
+                  >
+                    {exp.priority}
+                  </span>
+                </td>
+
+                <td>{exp.description}</td>
               </tr>
-            ) : (
-              filteredExpenses.map((exp) => (
-                <tr key={exp.expense_id}>
-                  <td>
-                    <span className="category-badge">
-                      {exp.expense_type}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="amount-badge">
-                      ₹{Number(exp.amount).toLocaleString("en-IN")}
-                    </span>
-                  </td>
-                  <td>
-                    {new Date(exp.expense_date).toLocaleDateString()}
-                  </td>
-                  <td>{exp.description}</td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
@@ -236,7 +220,6 @@ export default function Expenses() {
             <h2>Add Expense</h2>
 
             <input
-              type="text"
               placeholder="Expense Type"
               value={formData.expense_type}
               onChange={(e) =>
@@ -271,7 +254,6 @@ export default function Expenses() {
             />
 
             <input
-              type="text"
               placeholder="Description"
               value={formData.description}
               onChange={(e) =>
@@ -285,10 +267,13 @@ export default function Expenses() {
             <div className="modal-actions">
               <button
                 className="cancel-btn"
-                onClick={() => setShowModal(false)}
+                onClick={() =>
+                  setShowModal(false)
+                }
               >
                 Cancel
               </button>
+
               <button
                 className="primary-btn"
                 onClick={handleAddExpense}
@@ -299,6 +284,66 @@ export default function Expenses() {
           </div>
         </div>
       )}
+
+      {/* ⭐ BILL POPUP */}
+      {showInvoice && selectedExpense && (
+        <div className="invoice-overlay">
+
+          <div className="invoice-card">
+
+            <div className="invoice-header">
+              <h2>Expense Bill</h2>
+              <span className={`bill-priority ${selectedExpense.priority}`}>
+                {selectedExpense.priority}
+              </span>
+            </div>
+
+            <div className="invoice-amount">
+              ₹{Number(selectedExpense.amount).toLocaleString("en-IN")}
+            </div>
+
+            <div className="invoice-divider" />
+
+            <div className="invoice-row">
+              <span>ID</span>
+              <span>{selectedExpense.expense_id}</span>
+            </div>
+
+            <div className="invoice-row">
+              <span>Type</span>
+              <span>{selectedExpense.expense_type}</span>
+            </div>
+
+            <div className="invoice-row">
+              <span>Date</span>
+              <span>
+                {new Date(selectedExpense.expense_date).toLocaleDateString()}
+              </span>
+            </div>
+
+            <div className="invoice-row">
+              <span>Description</span>
+              <span>
+                {selectedExpense.description || "None"}
+              </span>
+            </div>
+
+            <div className="invoice-divider" />
+
+            <div className="invoice-footer">
+              <button
+                className="close-bill-btn"
+                onClick={() => setShowInvoice(false)}
+              >
+                Close
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
     </div>
   );
 }

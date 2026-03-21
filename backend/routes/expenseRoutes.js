@@ -1,46 +1,49 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const axios = require("axios");
 
 /* =====================================
-   ✅ GET expenses by branch (month-wise optional)
-   ===================================== */
+   GET expenses by branch
+===================================== */
 router.get("/:branchId", async (req, res) => {
   const { branchId } = req.params;
-  const { month } = req.query; // format: YYYY-MM
+  const { month } = req.query;
 
   try {
     let query = `
-      SELECT 
+      SELECT
         expense_id,
         expense_type,
         amount,
         expense_date,
-        description
+        description,
+        priority
       FROM expenses
       WHERE branch_id = $1
     `;
+
     const params = [branchId];
 
-    // ✅ Month-wise filter
     if (month) {
-      query += ` AND TO_CHAR(expense_date, 'YYYY-MM') = $2`;
+      query += ` AND TO_CHAR(expense_date,'YYYY-MM') = $2`;
       params.push(month);
     }
 
     query += ` ORDER BY expense_date DESC`;
 
     const result = await db.query(query, params);
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("Fetch expenses error:", error);
-    res.status(500).json({ message: "Failed to fetch expenses" });
+    res.json(result.rows);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Fetch expense failed" });
   }
 });
 
 /* =====================================
-   ✅ ADD expense
-   ===================================== */
+   ADD expense WITH ML PRIORITY
+===================================== */
 router.post("/", async (req, res) => {
   const {
     branch_id,
@@ -50,35 +53,49 @@ router.post("/", async (req, res) => {
     description
   } = req.body;
 
-  // 🔒 Basic validation
-  if (!branch_id || !expense_type || !amount || !expense_date) {
-    return res.status(400).json({
-      message: "Missing required fields"
-    });
-  }
-
   try {
+
+    /* ⭐ CALL ML SERVER */
+    const ml = await axios.post(
+      "http://127.0.0.1:5002/predict-priority",
+      { text: expense_type }
+    );
+
+    const priority = ml.data.priority;
+
+    /* ⭐ INSERT INTO DB */
     const result = await db.query(
       `
       INSERT INTO expenses
-      (branch_id, expense_type, amount, expense_date, description)
-      VALUES ($1, $2, $3, $4, $5)
+      (branch_id, expense_type, amount, expense_date, description, priority)
+      VALUES ($1,$2,$3,$4,$5,$6)
       RETURNING *
       `,
-      [branch_id, expense_type, amount, expense_date, description || ""]
+      [
+        branch_id,
+        expense_type,
+        amount,
+        expense_date,
+        description || "",
+        priority
+      ]
     );
 
-    // Notify owner (role_id = 1) about new expense
+    /* ⭐ NOTIFICATION */
     await db.query(
       `INSERT INTO notifications (branch_id, role_id, message, type)
-       VALUES ($1, 1, $2, 'EXPENSE')`,
-      [branch_id, `New expense of ₹${amount} recorded at branch ${branch_id}: ${expense_type}.`]
+       VALUES ($1,1,$2,'EXPENSE')`,
+      [
+        branch_id,
+        `New ${priority.toUpperCase()} expense ₹${amount} : ${expense_type}`
+      ]
     );
 
     res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("Add expense error:", error);
-    res.status(500).json({ message: "Failed to add expense" });
+
+  } catch (err) {
+    console.log("Add expense error:", err.message);
+    res.status(500).json({ message: "Add expense failed" });
   }
 });
 

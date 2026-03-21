@@ -174,6 +174,20 @@ exports.registerManager = async (req, res) => {
       "UPDATE branches SET manager_id=$1, is_code_used=TRUE WHERE branch_id=$2",
       [userRes.rows[0].user_id, branchRes.rows[0].branch_id]
     );
+    // 🔔 Notify Franchise Owner that Manager Registered
+    await pool.query(
+`
+INSERT INTO notifications
+(branch_id, role_id, message, type)
+VALUES ($1, $2, $3, $4)
+`,
+[
+ branchRes.rows[0].branch_id,
+ 1,   // ✅ Franchise Owner
+ `📢 New Branch Manager "${name}" has registered for branch "${branchRes.rows[0].branch_name}"`,
+ "MANAGER_REGISTERED"
+]
+);
 
     // Notify owner (role_id = 1) about new manager
     await pool.query(

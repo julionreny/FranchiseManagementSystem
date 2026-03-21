@@ -61,36 +61,23 @@
 .glass-card {
   background: rgba(30, 41, 59, 0.4);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: 20px;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.4);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 15px 35px -5px rgba(0,0,0,0.4);
   position: relative;
-  overflow: hidden;
+
+  /* ⭐ VERY IMPORTANT */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform: translateY(0);
+  will-change: transform;
 }
 
 .glass-card:hover {
-  transform: translateY(-8px) scale(1.01);
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(30, 41, 59, 0.6);
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+  transform: translateY(-6px);   /* ⭐ NO SCALE */
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  z-index: 20;
 }
 
-.glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-  transition: 0.5s;
-}
-
-.glass-card:hover::after {
-  left: 100%;
-}
 
 /* =====================
    KPI GRID & METRICS
@@ -198,12 +185,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
+  align-items: start;   /* ⭐ prevents jump */
 }
 
 .branch-card {
   padding: 24px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .branch-card::before {
@@ -480,4 +468,39 @@
 
 .options-dropdown .delete-option svg {
   color: #ef4444;
+}
+/* ⭐⭐⭐ FINAL DROPDOWN FIX */
+
+.branches-grid {
+  overflow: visible !important;
+}
+
+.branch-card {
+  overflow: visible !important;
+  z-index: 1;
+}
+
+.branch-card:hover {
+  z-index: 50;
+}
+
+.branch-options {
+  position: relative;
+}
+
+.options-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 220px;
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  z-index: 99999 !important;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
+
+/* ⭐ prevent grid clipping */
+.branches-grid > div {
+  overflow: visible !important;
 }

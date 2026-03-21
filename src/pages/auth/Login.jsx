@@ -42,7 +42,7 @@ if (res.data.user.role_id === 1) {
           sales, inventory, and notifications efficiently.
         </p>
         <ul>
-          <li>✔ Secure role-based access</li>
+          <li>✔ Role-based access</li>
           <li>✔ OTP-based authentication</li>
           <li>✔ Real-time operational insights</li>
         </ul>

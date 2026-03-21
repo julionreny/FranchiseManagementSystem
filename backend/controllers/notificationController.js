@@ -80,3 +80,33 @@ exports.deleteNotification = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+exports.getOwnerNotifications = async (req, res) => {
+  const { franchiseId } = req.params;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT 
+        n.notification_id,
+        n.message,
+        n.type,
+        n.created_at,
+        b.branch_name,
+        b.location
+      FROM notifications n
+      JOIN branches b 
+        ON n.branch_id = b.branch_id
+      WHERE b.franchise_id = $1
+      AND n.role_id = 1
+      ORDER BY n.created_at DESC
+      `,
+      [franchiseId]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("Owner notification error:", err);
+    res.status(500).json({ message: "Failed to fetch owner notifications" });
+  }
+};

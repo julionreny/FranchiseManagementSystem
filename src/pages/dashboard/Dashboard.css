@@ -421,3 +421,41 @@
   }
 
 }
+
+
+
+
+.ml-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.ml-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ml-controls select,
+.ml-controls button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: white;
+}
+
+.ml-controls button {
+  background: #10b981;
+  border: none;
+  cursor: pointer;
+}
+
+.prediction-result {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #10b981;
+}

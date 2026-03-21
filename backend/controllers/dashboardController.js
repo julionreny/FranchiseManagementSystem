@@ -1,206 +1,249 @@
 const db = require("../config/db");
 
 /* =========================
-   GET DASHBOARD SUMMARY (BRANCH - for Manager)
+   MANAGER DASHBOARD SUMMARY
 ========================= */
 exports.getDashboardSummary = async (req, res) => {
   const { branchId } = req.params;
+
   try {
-    /* TODAY SALES */
     const todaySales = await db.query(
-      `SELECT COALESCE(SUM(amount), 0) AS total
+      `SELECT COALESCE(SUM(amount),0) AS total
        FROM sales
-       WHERE branch_id = $1 AND DATE(sale_date) = CURRENT_DATE`,
+       WHERE branch_id=$1
+       AND DATE(sale_date)=CURRENT_DATE`,
       [branchId]
     );
 
-    /* MONTHLY SALES */
     const monthlySales = await db.query(
-      `SELECT COALESCE(SUM(amount), 0) AS total
+      `SELECT COALESCE(SUM(amount),0) AS total
        FROM sales
-       WHERE branch_id = $1 AND DATE_TRUNC('month', sale_date) = DATE_TRUNC('month', CURRENT_DATE)`,
+       WHERE branch_id=$1
+       AND DATE_TRUNC('month',sale_date)=DATE_TRUNC('month',CURRENT_DATE)`,
       [branchId]
     );
 
-    /* INVENTORY COUNT */
     const inventoryCount = await db.query(
-      `SELECT COUNT(*) AS total FROM inventory WHERE branch_id = $1`,
+      `SELECT COUNT(*) FROM inventory WHERE branch_id=$1`,
       [branchId]
     );
 
-    /* EMPLOYEE COUNT */
     const employeeCount = await db.query(
-      `SELECT COUNT(*) AS total FROM employees WHERE branch_id = $1`,
+      `SELECT COUNT(*) FROM employees WHERE branch_id=$1`,
       [branchId]
     );
 
     res.json({
       todaySales: Number(todaySales.rows[0].total),
       monthlySales: Number(monthlySales.rows[0].total),
-      inventoryCount: Number(inventoryCount.rows[0].total),
-      employeeCount: Number(employeeCount.rows[0].total),
+      inventoryCount: Number(inventoryCount.rows[0].count),
+      employeeCount: Number(employeeCount.rows[0].count)
     });
+
   } catch (err) {
-    console.error("Dashboard Summary Error:", err);
-    res.status(500).json({ message: "Failed to fetch dashboard summary" });
+    console.error(err);
+    res.status(500).json({ message: "Dashboard summary failed" });
   }
 };
 
+
 /* =========================
-   GET SALES LAST 7 DAYS (BRANCH - for Manager)
+   MANAGER SALES LAST 7 DAYS
 ========================= */
 exports.getSalesLast7Days = async (req, res) => {
   const { branchId } = req.params;
+
   try {
     const result = await db.query(
       `SELECT
-         TO_CHAR(d.date, 'Dy') AS day,
-         COALESCE(SUM(s.amount), 0) AS sales
-       FROM generate_series(CURRENT_DATE - INTERVAL '6 days', CURRENT_DATE, '1 day') AS d(date)
-       LEFT JOIN sales s ON s.sale_date = d.date AND s.branch_id = $1
-       GROUP BY d.date ORDER BY d.date`,
+        TO_CHAR(d,'Dy') AS day,
+        COALESCE(SUM(s.amount),0) AS sales
+       FROM generate_series(
+          CURRENT_DATE-INTERVAL '6 days',
+          CURRENT_DATE,
+          '1 day'
+       ) d
+       LEFT JOIN sales s
+       ON DATE(s.sale_date)=d
+       AND s.branch_id=$1
+       GROUP BY d
+       ORDER BY d`,
       [branchId]
     );
+
     res.json(result.rows);
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to fetch sales chart" });
+    res.status(500).json({ message: "Sales chart failed" });
   }
 };
 
+
 /* =========================
-   GET EXPENSE BREAKDOWN (BRANCH - for Manager)
+   MANAGER EXPENSE BREAKDOWN
 ========================= */
 exports.getExpenseBreakdown = async (req, res) => {
   const { branchId } = req.params;
+
   try {
     const result = await db.query(
-      `SELECT expense_type AS name, SUM(amount) AS value
-       FROM expenses WHERE branch_id = $1
+      `SELECT expense_type AS name,
+              SUM(amount) AS value
+       FROM expenses
+       WHERE branch_id=$1
        GROUP BY expense_type`,
       [branchId]
     );
-    const formatted = result.rows.map(row => ({
-      name: row.name,
-      value: Number(row.value)
-    }));
-    res.json(formatted);
+
+    res.json(
+      result.rows.map(r => ({
+        name: r.name,
+        value: Number(r.value)
+      }))
+    );
+
   } catch (err) {
-    console.error("Expense Chart Error:", err);
-    res.status(500).json({ message: "Failed to fetch expense breakdown" });
+    console.error(err);
+    res.status(500).json({ message: "Expense chart failed" });
   }
 };
 
+
 /* =========================
-   OWNER: FRANCHISE SUMMARY STATS
+   OWNER DASHBOARD STATS
 ========================= */
 exports.getOwnerDashboardStats = async (req, res) => {
   const { franchiseId } = req.params;
+
   try {
-    const statsResult = await db.query(
-      `WITH branch_list AS (
-         SELECT branch_id FROM branches WHERE franchise_id = $1
-       ),
-       rev AS (
-         SELECT SUM(amount) AS total FROM sales 
-         WHERE branch_id IN (SELECT branch_id FROM branch_list)
-       ),
-       exp AS (
-         SELECT SUM(amount) AS total FROM expenses 
-         WHERE branch_id IN (SELECT branch_id FROM branch_list)
-       ),
-       emp AS (
-         SELECT COUNT(*) AS total FROM employees 
-         WHERE branch_id IN (SELECT branch_id FROM branch_list)
-       ),
-       br AS (
-         SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE status = 'ACTIVE') AS active 
-         FROM branches WHERE franchise_id = $1
-       )
-       SELECT 
-         COALESCE((SELECT total FROM rev), 0) AS total_revenue,
-         COALESCE((SELECT total FROM exp), 0) AS total_expenses,
-         (SELECT total FROM emp) AS total_employees,
-         (SELECT total FROM br) AS total_branches,
-         (SELECT active FROM br) AS active_branches`,
+    const result = await db.query(
+      `SELECT
+        COALESCE(SUM(s.amount),0) AS revenue,
+        COALESCE((SELECT SUM(amount)
+                  FROM expenses e
+                  JOIN branches b ON e.branch_id=b.branch_id
+                  WHERE b.franchise_id=$1),0) AS expenses,
+        COUNT(DISTINCT emp.employee_id) AS employees,
+        COUNT(DISTINCT br.branch_id) AS branches,
+        COUNT(DISTINCT br.branch_id)
+          FILTER (WHERE br.status='ACTIVE') AS active
+       FROM branches br
+       LEFT JOIN sales s ON s.branch_id=br.branch_id
+       LEFT JOIN employees emp ON emp.branch_id=br.branch_id
+       WHERE br.franchise_id=$1`,
       [franchiseId]
     );
 
-    const s = statsResult.rows[0];
-    const totalRevenue = Number(s.total_revenue);
-    const totalExpenses = Number(s.total_expenses);
-    const efficiencyScore = totalRevenue > 0
-      ? Math.min(99, Math.round(((totalRevenue - totalExpenses) / totalRevenue) * 100 + 50))
-      : 92;
+    const r = result.rows[0];
+
+    const revenue = Number(r.revenue);
+    const expenses = Number(r.expenses);
 
     res.json({
-      totalRevenue,
-      totalBranches: Number(s.total_branches),
-      activeBranches: Number(s.active_branches),
-      totalEmployees: Number(s.total_employees),
-      efficiencyScore,
+      totalRevenue: revenue,
+      totalBranches: Number(r.branches),
+      activeBranches: Number(r.active),
+      totalEmployees: Number(r.employees),
+      efficiencyScore:
+        revenue > 0
+          ? Math.round(((revenue - expenses) / revenue) * 100)
+          : 0
     });
+
   } catch (err) {
-    console.error("Owner dashboard stats error:", err);
-    res.status(500).json({ message: "Failed to fetch owner stats" });
+    console.error(err);
+    res.status(500).json({ message: "Owner stats failed" });
   }
 };
 
+
 /* =========================
-   OWNER: MULTI-BRANCH 30-DAY PERFORMANCE
+   ⭐ OWNER MULTI BRANCH TREND (FINAL FIX)
 ========================= */
 exports.getOwnerBranchTrend = async (req, res) => {
   const { franchiseId } = req.params;
+
   try {
+
     const result = await db.query(
-      `SELECT
-         b.branch_id, b.branch_name, b.location,
-         TO_CHAR(d.date, 'Mon DD') AS name,
-         COALESCE(SUM(s.amount), 0) AS revenue
-       FROM generate_series(CURRENT_DATE - INTERVAL '29 days', CURRENT_DATE, '1 day') AS d(date)
-       CROSS JOIN branches b
-       LEFT JOIN sales s ON s.branch_id = b.branch_id AND DATE(s.sale_date) = d.date
-       WHERE b.franchise_id = $1
-       GROUP BY b.branch_id, b.branch_name, b.location, d.date
-       ORDER BY d.date`,
+      `
+      SELECT
+        b.branch_name,
+        DATE(s.sale_date) AS sale_date,
+        COALESCE(SUM(s.amount),0) AS revenue
+
+      FROM branches b
+
+      LEFT JOIN sales s
+      ON s.branch_id = b.branch_id
+      AND s.sale_date >= CURRENT_DATE - INTERVAL '29 days'
+
+      WHERE b.franchise_id = $1
+
+      GROUP BY b.branch_name, DATE(s.sale_date)
+
+      ORDER BY sale_date
+      `,
       [franchiseId]
     );
+
     res.json(result.rows);
+
   } catch (err) {
-    console.error("Owner branch trend error:", err);
-    res.status(500).json({ message: "Failed to fetch branch trend" });
+    console.error("TREND ERROR:", err);
+    res.status(500).json({ message: "Trend fetch failed" });
   }
 };
 
 /* =========================
-   OWNER: PER-BRANCH PERFORMANCE
+   OWNER BRANCH PERFORMANCE
 ========================= */
 exports.getOwnerBranchPerformance = async (req, res) => {
+
   const { franchiseId } = req.params;
+
   try {
+
     const result = await db.query(
-      `SELECT
-         b.branch_id, b.branch_name, b.location, b.status, b.manager_email,
-         COALESCE((SELECT SUM(amount) FROM sales WHERE branch_id = b.branch_id), 0) AS revenue,
-         COALESCE((SELECT SUM(amount) FROM expenses WHERE branch_id = b.branch_id), 0) AS expenses,
-         (SELECT COUNT(*) FROM employees WHERE branch_id = b.branch_id) AS employee_count
-       FROM branches b
-       WHERE b.franchise_id = $1
-       ORDER BY revenue DESC`,
+      `
+      SELECT
+        b.branch_id,
+        b.location AS branch_name,
+        COALESCE(SUM(s.amount),0) AS revenue,
+        COALESCE(
+          (SELECT SUM(amount)
+           FROM expenses e
+           WHERE e.branch_id=b.branch_id),0
+        ) AS expenses,
+        (SELECT COUNT(*)
+         FROM employees emp
+         WHERE emp.branch_id=b.branch_id) AS employee_count
+
+      FROM branches b
+      LEFT JOIN sales s
+      ON s.branch_id=b.branch_id
+
+      WHERE b.franchise_id=$1
+      GROUP BY b.branch_id, branch_name
+      ORDER BY revenue DESC
+      `,
       [franchiseId]
     );
 
-    const rows = result.rows.map(r => ({
-      ...r,
-      revenue: Number(r.revenue),
-      expenses: Number(r.expenses),
-      profit: Number(r.revenue) - Number(r.expenses),
-      employee_count: Number(r.employee_count),
-    }));
+    res.json(
+      result.rows.map(r => ({
+        ...r,
+        revenue: Number(r.revenue),
+        expenses: Number(r.expenses),
+        profit: Number(r.revenue) - Number(r.expenses),
+        employee_count: Number(r.employee_count)
+      }))
+    );
 
-    res.json(rows);
   } catch (err) {
-    console.error("Owner branch performance error:", err);
-    res.status(500).json({ message: "Failed to fetch branch performance" });
+    console.error(err);
+    res.status(500).json({ message: "Branch performance failed" });
   }
+
 };

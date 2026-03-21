@@ -17,6 +17,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgb(3, 3, 50);
 }
 
 /* ===== Auth Card ===== */
@@ -26,7 +27,7 @@ body {
   background: #020617;
   padding: 32px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgb(19, 21, 109);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
@@ -173,6 +174,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin-bottom: 30px;
 }
 
 .login-left h1 {
@@ -205,7 +207,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top, #0f172a, #020617);
+  background: radial-gradient(circle at top, #101729, #010b36);
 }
 
 /* ===== Responsive ===== */
