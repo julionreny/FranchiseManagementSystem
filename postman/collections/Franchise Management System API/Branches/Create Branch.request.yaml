@@ -1,0 +1,37 @@
+$kind: http-request
+name: Create Branch
+method: POST
+url: '{{baseUrl}}/api/branches/create'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "franchise_id": "{{franchiseId}}",
+      "branch_name": "Test Branch",
+      "location": "Petaling Jaya",
+      "manager_email": "manager@test.com"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function() {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has branch_id and invite_code", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("branch_id");
+        pm.expect(json).to.have.property("invite_code");
+      });
+
+      if (pm.response.code === 201) {
+        var json = pm.response.json();
+        if (json.branch_id) {
+          pm.environment.set("branchId", json.branch_id);
+        }
+      }

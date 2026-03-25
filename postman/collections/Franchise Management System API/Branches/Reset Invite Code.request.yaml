@@ -1,0 +1,19 @@
+$kind: http-request
+name: Reset Invite Code
+method: POST
+url: '{{baseUrl}}/api/branches/reset-invite/{{branchId}}'
+order: 6000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response has invite_code", function() {
+          var json = pm.response.json();
+          pm.expect(json).to.have.property("invite_code");
+        });
+      }

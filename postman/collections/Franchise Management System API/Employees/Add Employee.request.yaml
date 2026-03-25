@@ -1,0 +1,41 @@
+$kind: http-request
+name: Add Employee
+method: POST
+url: '{{baseUrl}}/api/employees/add'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_id": "{{branchId}}",
+      "name": "Ali Hassan",
+      "email": "ali@test.com",
+      "age": 28,
+      "designation": "Sales Executive",
+      "address": "123 Jalan Test",
+      "mobile_no": "0123456789",
+      "experience": 3,
+      "salary": 3500
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function() {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has message field", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("message");
+      });
+
+      if (pm.response.code === 201) {
+        var json = pm.response.json();
+        if (json.employee_id) {
+          pm.environment.set("employeeId", json.employee_id);
+        }
+      }

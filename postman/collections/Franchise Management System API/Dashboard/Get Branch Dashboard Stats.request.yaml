@@ -1,0 +1,23 @@
+$kind: http-request
+name: Get Branch Dashboard Stats
+method: GET
+url: '{{baseUrl}}/api/dashboard/branch/{{branchId}}'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function() {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has dashboard statistics", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.be.an("object");
+      });
+
+      pm.test("Response contains expected dashboard fields", function() {
+        var json = pm.response.json();
+        // Dashboard typically contains sales, expenses, inventory stats
+        pm.expect(json).to.have.any.keys("totalSales", "totalExpenses", "inventoryCount", "employeeCount", "sales", "expenses");
+      });

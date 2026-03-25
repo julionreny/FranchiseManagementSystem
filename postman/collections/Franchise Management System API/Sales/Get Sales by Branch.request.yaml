@@ -1,0 +1,28 @@
+$kind: http-request
+name: Get Sales by Branch
+method: GET
+url: '{{baseUrl}}/api/sales/{{branchId}}'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function() {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.be.an("array");
+      });
+
+      pm.test("Each item has sale_id, product_name, amount", function() {
+        var json = pm.response.json();
+        if (json.length > 0) {
+          json.forEach(function(item) {
+            pm.expect(item).to.have.property("sale_id");
+            pm.expect(item).to.have.property("product_name");
+            pm.expect(item).to.have.property("amount");
+          });
+        }
+      });

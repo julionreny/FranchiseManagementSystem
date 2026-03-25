@@ -67,29 +67,7 @@ exports.addExpense = async (req, res) => {
 
   try {
 
-    /* ⭐ CREATE FULL TEXT FOR ML */
-    const mlText = `${expense_type} ${description || ""}`;
-
-    let priority = "medium";   // ⭐ fallback priority
-
-    try {
-
-      /* ⭐ CALL ML SERVER */
-      const mlResponse = await axios.post(
-        "http://127.0.0.1:5002/predict-priority",
-        { text: mlText }
-      );
-
-      priority = mlResponse.data.priority;
-
-      console.log("ML Priority:", priority);
-
-    } catch (mlError) {
-
-      /* ⭐ IF ML SERVER DOWN — SYSTEM STILL WORKS */
-      console.log("ML server error — using default priority");
-
-    }
+    let priority = "medium";
 
     /* ⭐ INSERT EXPENSE */
     const result = await db.query(
@@ -102,9 +80,9 @@ exports.addExpense = async (req, res) => {
       [
         branch_id,
         expense_type,
-        amount,
-        expense_date,
-        description,
+        parseFloat(amount) || 0,
+        expense_date || new Date(),
+        description || "",
         priority
       ]
     );

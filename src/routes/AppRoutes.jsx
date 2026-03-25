@@ -4,8 +4,8 @@ import OwnerExpense from "../pages/owner/OwnerExpense";
 import OwnerInventory from "../pages/owner/OwnerInventory";
 import OwnerSales from "../pages/owner/OwnerSales";
 import BranchPerformance from "../pages/owner/BranchPerformance";
-// import SystemAnalytics from "../pages/owner/SystemAnalytics";
-// import HQReports from "../pages/owner/HQReports";
+import SystemAnalytics from "../pages/owner/SystemAnalytics";
+import HQReports from "../pages/owner/HQReports";
 import BranchManagement from "../pages/owner/BranchManagement";
 
 import Login from "../pages/auth/Login";
@@ -47,8 +47,8 @@ const AppRoutes = () => (
       <Route path="notifications" element={<Notifications />} />
       {/* Owner add-on routes */}
       <Route path="performance" element={<BranchPerformance />} />
-      {/* <Route path="analytics" element={<SystemAnalytics />} />
-      <Route path="reports" element={<HQReports />} /> */}
+      <Route path="analytics" element={<SystemAnalytics />} />
+      <Route path="reports" element={<HQReports />} />
       <Route path="branches" element={<BranchManagement />} />
     </Route>
 

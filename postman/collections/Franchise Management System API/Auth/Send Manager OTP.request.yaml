@@ -1,0 +1,26 @@
+$kind: http-request
+name: Send Manager OTP
+method: POST
+url: '{{baseUrl}}/api/auth/manager/send-otp'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "manager@test.com"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function() {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has message field", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("message");
+      });

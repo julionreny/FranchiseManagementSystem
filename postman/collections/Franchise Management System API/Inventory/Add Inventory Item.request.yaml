@@ -1,0 +1,30 @@
+$kind: http-request
+name: Add Inventory Item
+method: POST
+url: '{{baseUrl}}/api/inventory/add'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_id": "{{branchId}}",
+      "product_name": "Cooking Oil",
+      "quantity": 50,
+      "unit": "liters",
+      "reorder_level": 10
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function() {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has message field", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("message");
+      });

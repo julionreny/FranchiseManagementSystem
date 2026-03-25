@@ -1,0 +1,21 @@
+$kind: http-request
+name: Export Report to CSV
+method: GET
+url: '{{baseUrl}}/api/reports/branch/{{branchId}}/sales/export?format=csv'
+order: 10000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response is CSV or JSON", function() {
+          var contentType = pm.response.headers.get("Content-Type");
+          pm.expect(contentType).to.satisfy(function(ct) {
+            return ct.includes("csv") || ct.includes("json") || ct.includes("text");
+          });
+        });
+      }

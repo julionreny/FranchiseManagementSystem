@@ -1,0 +1,320 @@
+Environment loaded: baseUrl, franchiseId, branchId, ownerId, inventoryId, employeeId, notificationId
+
+--- FOLDER: Auth ---
+
+REQUEST: [POST] Forgot Password -> http://localhost:5000/api/auth/forgot-password
+   Request Error: timeout of 5000ms exceeded
+
+REQUEST: [POST] Login - Missing Fields -> http://localhost:5000/api/auth/login
+   Status: 400
+   PASS: Status is 400
+   PASS: Response has message field
+
+REQUEST: [POST] Login -> http://localhost:5000/api/auth/login
+   Status: 200
+   PASS: Status is 200 or 401
+   PASS: Response has user object with user_id and role_id
+      [Env Set] ownerId = 56
+      [Env Set] franchiseId = 11
+
+REQUEST: [POST] Register Manager -> http://localhost:5000/api/auth/manager/register
+   Status: 403
+   PASS: Status is 200, 400, or 403
+   PASS: Response body is an object
+
+REQUEST: [POST] Register Owner -> http://localhost:5000/api/auth/owner/register
+   Status: 403
+   PASS: Status is 201 or 403
+   PASS: Response body is an object
+
+REQUEST: [POST] Reset Password -> http://localhost:5000/api/auth/reset-password
+   Status: 400
+   PASS: Status is 200 or 400
+   PASS: Response has message field
+
+REQUEST: [POST] Send Manager OTP -> http://localhost:5000/api/auth/manager/send-otp
+   Request Error: timeout of 5000ms exceeded
+
+REQUEST: [POST] Send Owner OTP -> http://localhost:5000/api/auth/owner/send-otp
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has message field
+
+REQUEST: [POST] Verify OTP -> http://localhost:5000/api/auth/verify-otp
+   Status: 400
+   PASS: Status is 200 or 400
+   PASS: Response has message or error field
+
+--- FOLDER: Franchises ---
+
+REQUEST: [GET] Get Owner Franchise -> http://localhost:5000/api/franchises/owner/56
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array or object
+
+--- FOLDER: Branches ---
+
+REQUEST: [POST] Create Branch - Missing Fields -> http://localhost:5000/api/branches/create
+   Status: 400
+   PASS: Status is 400
+   PASS: Response has error field
+
+REQUEST: [POST] Create Branch -> http://localhost:5000/api/branches/create
+   Status: 201
+   PASS: Status is 201
+   PASS: Response has branch_id and invite_code
+      [Env Set] branchId = 66
+
+SKIPPING: [DELETE] Delete Branch
+
+REQUEST: [GET] Get Branches by Franchise -> http://localhost:5000/api/branches/franchise/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+   PASS: Each item has branch_id, branch_name, location
+
+REQUEST: [POST] Reset Invite Code -> http://localhost:5000/api/branches/reset-invite/66
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has invite_code
+
+REQUEST: [PUT] Update Branch -> http://localhost:5000/api/branches/update/66
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has message and branch fields
+
+--- FOLDER: Employees ---
+
+REQUEST: [POST] Add Employee -> http://localhost:5000/api/employees/add
+   Status: 201
+   PASS: Status is 201
+   PASS: Response has message field
+
+SKIPPING: [DELETE] Delete Employee
+
+REQUEST: [GET] Get Employees by Branch -> http://localhost:5000/api/employees/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+REQUEST: [GET] Get Employees by Franchise -> http://localhost:5000/api/employees/franchise/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+--- FOLDER: Inventory ---
+
+REQUEST: [POST] Add Inventory - Missing Fields -> http://localhost:5000/api/inventory/add
+   Status: 400
+   PASS: Status is 400
+   PASS: Response has message field
+
+REQUEST: [POST] Add Inventory Item -> http://localhost:5000/api/inventory/add
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has message field
+
+SKIPPING: [DELETE] Delete Inventory Item
+
+REQUEST: [GET] Get Inventory by Branch -> http://localhost:5000/api/inventory/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+   PASS: Each item has inventory_id, product_name, quantity, unit, reorder_level
+
+REQUEST: [PUT] Update Stock -> http://localhost:5000/api/inventory/update-quantity/1
+   Status: 404
+   PASS: Status is 200 or 404
+
+--- FOLDER: Sales ---
+
+REQUEST: [POST] Add Sale - High Value -> http://localhost:5000/api/sales/
+   Status: 500
+      Error Response: {"message":"Failed to add sale","error":"insert or update on table \"sales\" violates foreign key constraint \"sales_created_by_fkey\"","body":{"branch_id":"66","product_name":"Catering Package","customer_name":"Corporate Client","contact":"0198765432","amount":50000,"payment_method":"Bank Transfer","sale_date":"2026-03-25","created_by":1}}
+   FAIL: Status is 201 (Expected 201 got 500)
+   PASS: Amount is >= 10000 (notification should be triggered)
+
+REQUEST: [POST] Add Sale -> http://localhost:5000/api/sales/
+   Status: 500
+      Error Response: {"message":"Failed to add sale","error":"insert or update on table \"sales\" violates foreign key constraint \"sales_created_by_fkey\"","body":{"branch_id":"66","product_name":"Nasi Lemak Set","customer_name":"Ahmad","contact":"0123456789","amount":15000,"payment_method":"Cash","sale_date":"2026-03-25","created_by":1}}
+   FAIL: Status is 201 (Expected 201 got 500)
+   FAIL: Response has sale_id, receipt_no, amount (Prop sale_id missing)
+   FAIL: receipt_no starts with RCPT- (Regex mismatch)
+
+REQUEST: [GET] Get Sales by Branch with Month Filter -> http://localhost:5000/api/sales/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+REQUEST: [GET] Get Sales by Branch -> http://localhost:5000/api/sales/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+   PASS: Each item has sale_id, product_name, amount
+
+--- FOLDER: Expenses ---
+
+REQUEST: [POST] Add Expense -> http://localhost:5000/api/expenses/
+   Status: 201
+   PASS: Status is 201
+   PASS: Response has expense_id, expense_type, amount, priority
+
+REQUEST: [GET] Get Expenses by Branch -> http://localhost:5000/api/expenses/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+   PASS: Each item has expense_id, expense_type, amount
+
+REQUEST: [GET] Get Expenses with Month Filter -> http://localhost:5000/api/expenses/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+--- FOLDER: Owner Views ---
+
+REQUEST: [GET] Get Owner Expenses -> http://localhost:5000/api/owner-expenses/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array or object
+
+REQUEST: [GET] Get Owner Inventory -> http://localhost:5000/api/owner-inventory/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array or object
+
+REQUEST: [GET] Get Owner Sales -> http://localhost:5000/api/owner-sales/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array or object
+
+--- FOLDER: Notifications ---
+
+REQUEST: [DELETE] Delete All Manager Notifications -> http://localhost:5000/api/notifications/branch/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has message field
+
+REQUEST: [DELETE] Delete All Owner Notifications -> http://localhost:5000/api/notifications/owner/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has message field
+
+REQUEST: [DELETE] Delete Single Notification -> http://localhost:5000/api/notifications/1
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has message field
+
+REQUEST: [GET] Get Manager Notifications -> http://localhost:5000/api/notifications/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+REQUEST: [GET] Get Owner Notifications -> http://localhost:5000/api/notifications/owner/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an array
+
+--- FOLDER: Dashboard ---
+
+REQUEST: [GET] Get Branch Dashboard Stats -> http://localhost:5000/api/dashboard/branch/66
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has dashboard statistics
+   FAIL: Response contains expected dashboard fields (Cannot read properties of undefined (reading 'keys'))
+
+REQUEST: [GET] Get Branch Dashboard with Month Filter -> http://localhost:5000/api/dashboard/branch/66?month=2024-01
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an object
+   FAIL: Filtered data returned (Cannot read properties of undefined (reading 'keys'))
+
+REQUEST: [GET] Get Branch Performance Metrics -> http://localhost:5000/api/dashboard/branch/66/performance
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has performance metrics
+
+REQUEST: [GET] Get Franchise Overview -> http://localhost:5000/api/dashboard/franchise/11/overview
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has franchise overview
+
+REQUEST: [GET] Get Owner Dashboard Stats -> http://localhost:5000/api/dashboard/owner/11
+   Status: 200
+   PASS: Status is 200
+   PASS: Response has owner dashboard statistics
+   FAIL: Response contains franchise-wide stats (Cannot read properties of undefined (reading 'keys'))
+
+REQUEST: [GET] Get Owner Dashboard with Month Filter -> http://localhost:5000/api/dashboard/owner/11?month=2024-01
+   Status: 200
+   PASS: Status is 200
+   PASS: Response is an object
+   FAIL: Monthly filtered data returned (Cannot read properties of undefined (reading 'keys'))
+
+--- FOLDER: Reports ---
+
+REQUEST: [GET] Export Report to CSV -> http://localhost:5000/api/reports/branch/66/sales/export?format=csv
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response is CSV or JSON
+
+REQUEST: [GET] Get Branch Expense Report -> http://localhost:5000/api/reports/branch/66/expenses
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has expense report data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Branch Inventory Report -> http://localhost:5000/api/reports/branch/66/inventory
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has inventory report data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Branch Sales Report with Date Range -> http://localhost:5000/api/reports/branch/66/sales?startDate=2024-01-01&endDate=2024-12-31
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has filtered sales data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Branch Sales Report -> http://localhost:5000/api/reports/branch/66/sales
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has sales report data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Comparative Branch Report -> http://localhost:5000/api/reports/franchise/11/branch-comparison?month=2024-01
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has branch comparison data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Custom Date Range Report -> http://localhost:5000/api/reports/branch/66/custom?startDate=2024-01-01&endDate=2024-12-31
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has report data
+
+REQUEST: [GET] Get Employee Performance Report -> http://localhost:5000/api/reports/branch/66/employee-performance
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has employee performance data (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Franchise Performance Report -> http://localhost:5000/api/reports/franchise/11/performance
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has performance metrics
+
+REQUEST: [GET] Get Franchise Summary Report -> http://localhost:5000/api/reports/franchise/11/summary
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has franchise summary data
+
+REQUEST: [GET] Get Low Stock Alert Report -> http://localhost:5000/api/reports/franchise/11/low-stock
+   Status: 200
+   PASS: Status is 200 or 404
+   FAIL: Response has low stock items (Cannot read properties of undefined (reading 'an'))
+
+REQUEST: [GET] Get Profit Loss Report -> http://localhost:5000/api/reports/franchise/11/profit-loss?month=2024-01
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has profit/loss data
+
+REQUEST: [GET] Get Trend Analysis Report -> http://localhost:5000/api/reports/franchise/11/trends?period=quarterly&year=2024
+   Status: 200
+   PASS: Status is 200 or 404
+   PASS: Response has trend data
+
+All tests completed.

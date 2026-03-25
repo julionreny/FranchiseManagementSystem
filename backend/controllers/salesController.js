@@ -33,8 +33,8 @@ exports.getSalesByBranch = async (req, res) => {
     const result = await db.query(query, params);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch sales" });
+    console.error("ADD EXPENSE ERR:", err);
+    res.status(500).json({ message: "Add expense failed", error: err.message, body: req.body });
   }
 };
 
@@ -71,19 +71,19 @@ exports.addSale = async (req, res) => {
         sale_date,
         created_by
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8, COALESCE($9, (SELECT user_id FROM users LIMIT 1)))
       RETURNING *
       `,
       [
         receiptNo,
         branch_id,
         product_name,
-        customer_name,
-        contact,
-        amount,
-        payment_method,
-        sale_date,
-        created_by
+        customer_name || "Guest Customer",
+        contact || "",
+        parseFloat(amount) || 0,
+        payment_method || "Cash",
+        sale_date || new Date(),
+        created_by || null
       ]
     );
 
@@ -103,7 +103,7 @@ exports.addSale = async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to add sale" });
+    console.error("ADD SALE ERR:", err);
+    res.status(500).json({ message: "Failed to add sale", error: err.message, body: req.body });
   }
 };

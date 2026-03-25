@@ -38,8 +38,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const ownerExpenseRoutes = require("./routes/ownerExpenseRoutes");
 const ownerInventoryRoutes = require("./routes/ownerInventoryRoutes");
 const ownerSalesRoutes = require("./routes/ownerSalesRoutes");
-const priorityRoutes = require("./routes/priorityRoutes");
-
+const reportRoutes = require("./routes/reportRoutes");
 
 
 
@@ -48,8 +47,6 @@ const priorityRoutes = require("./routes/priorityRoutes");
 /* =========================
    ROUTES USE
 ========================= */
-
-app.use("/api/ml", priorityRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/branches", branchRoutes);
@@ -64,6 +61,7 @@ app.use("/api/owner-sales", ownerSalesRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportRoutes);
 
 /* =========================
    SERVER START

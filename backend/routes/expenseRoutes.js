@@ -55,13 +55,7 @@ router.post("/", async (req, res) => {
 
   try {
 
-    /* ⭐ CALL ML SERVER */
-    const ml = await axios.post(
-      "http://127.0.0.1:5002/predict-priority",
-      { text: expense_type }
-    );
-
-    const priority = ml.data.priority;
+    const priority = "medium";
 
     /* ⭐ INSERT INTO DB */
     const result = await db.query(

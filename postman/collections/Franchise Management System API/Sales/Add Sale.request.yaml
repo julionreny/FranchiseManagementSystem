@@ -1,0 +1,40 @@
+$kind: http-request
+name: Add Sale
+method: POST
+url: '{{baseUrl}}/api/sales/'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_id": "{{branchId}}",
+      "product_name": "Nasi Lemak Set",
+      "customer_name": "Ahmad",
+      "contact": "0123456789",
+      "amount": 15000,
+      "payment_method": "Cash",
+      "sale_date": "2026-03-25",
+      "created_by": 1
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function() {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has sale_id, receipt_no, amount", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("sale_id");
+        pm.expect(json).to.have.property("receipt_no");
+        pm.expect(json).to.have.property("amount");
+      });
+
+      pm.test("receipt_no starts with RCPT-", function() {
+        var json = pm.response.json();
+        pm.expect(json.receipt_no).to.match(/^RCPT-/);
+      });

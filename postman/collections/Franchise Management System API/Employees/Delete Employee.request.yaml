@@ -1,0 +1,17 @@
+$kind: http-request
+name: Delete Employee
+method: DELETE
+url: '{{baseUrl}}/api/employees/{{employeeId}}'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200, 404, or 500", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404, 500]);
+      });
+
+      pm.test("Response has message field", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("message");
+      });

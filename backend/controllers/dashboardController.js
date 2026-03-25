@@ -177,7 +177,7 @@ exports.getOwnerBranchTrend = async (req, res) => {
 
       LEFT JOIN sales s
       ON s.branch_id = b.branch_id
-      AND s.sale_date >= CURRENT_DATE - INTERVAL '29 days'
+      AND s.sale_date >= CURRENT_DATE - INTERVAL '89 days'
 
       WHERE b.franchise_id = $1
 

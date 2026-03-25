@@ -1,0 +1,19 @@
+$kind: http-request
+name: Get Custom Date Range Report
+method: GET
+url: '{{baseUrl}}/api/reports/branch/{{branchId}}/custom?startDate=2024-01-01&endDate=2024-12-31'
+order: 11000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response has report data", function() {
+          var json = pm.response.json();
+          pm.expect(json).to.be.an("object");
+        });
+      }

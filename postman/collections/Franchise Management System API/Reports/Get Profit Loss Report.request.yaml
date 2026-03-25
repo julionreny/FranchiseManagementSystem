@@ -1,0 +1,19 @@
+$kind: http-request
+name: Get Profit Loss Report
+method: GET
+url: '{{baseUrl}}/api/reports/franchise/{{franchiseId}}/profit-loss?month=2024-01'
+order: 7000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response has profit/loss data", function() {
+          var json = pm.response.json();
+          pm.expect(json).to.be.an("object");
+        });
+      }

@@ -1,0 +1,3 @@
+$kind: collection
+name: Owner Views
+description: Owner-specific view endpoints for aggregated data

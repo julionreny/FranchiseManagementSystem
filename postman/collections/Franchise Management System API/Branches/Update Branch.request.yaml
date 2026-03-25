@@ -1,0 +1,30 @@
+$kind: http-request
+name: Update Branch
+method: PUT
+url: '{{baseUrl}}/api/branches/update/{{branchId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "branch_name": "Updated Branch Name",
+      "location": "Shah Alam"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response has message and branch fields", function() {
+          var json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json).to.have.property("branch");
+        });
+      }

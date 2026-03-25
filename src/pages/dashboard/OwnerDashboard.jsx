@@ -85,6 +85,16 @@ const OwnerDashboard = () => {
 
   }, [navigate]);
 
+  // Handle Legend Click for Toggling Visibility
+  const [hiddenBranches, setHiddenBranches] = useState(new Set());
+  const toggleBranch = (o) => {
+    const { dataKey } = o;
+    const newHidden = new Set(hiddenBranches);
+    if (newHidden.has(dataKey)) newHidden.delete(dataKey);
+    else newHidden.add(dataKey);
+    setHiddenBranches(newHidden);
+  };
+
   return (
     <div className="owner-dashboard-wrapper">
 
@@ -94,7 +104,6 @@ const OwnerDashboard = () => {
 
       {/* ===== STAT CARDS ===== */}
       <div className="owner-stats-grid">
-
         <div className="owner-stat-card green">
           <h4>Total System Revenue</h4>
           <div className="owner-stat-value">
@@ -122,56 +131,93 @@ const OwnerDashboard = () => {
             {stats?.totalEmployees || 0}
           </div>
         </div>
-
       </div>
 
       {/* ===== CHART ===== */}
       <div className="owner-chart-grid">
-
         <div className="owner-chart-box" style={{ gridColumn: "span 2" }}>
-
-          <div className="owner-chart-header">
-            <h3 className="owner-chart-title">
-              Multi-Branch Performance (Last 30 Days)
-            </h3>
-
-            <span className="owner-chart-total">
+          <div className="owner-chart-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3 className="owner-chart-title" style={{ margin: 0 }}>
+                Aggregate Network Revenue (90 Days)
+              </h3>
+              <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#64748b" }}>
+                Stacked view showing individual branch contributions. Click legend to filter.
+              </p>
+            </div>
+            <span className="owner-chart-total" style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "8px 16px", borderRadius: "8px", fontWeight: "bold" }}>
               Total ₹{(stats?.totalRevenue || 0).toLocaleString()}
             </span>
           </div>
 
           {loading ? (
-            <div style={{ padding: 40, textAlign: "center" }}>
-              Loading chart...
+            <div style={{ padding: 40, textAlign: "center", color: "#64748b" }}>
+              Loading aggregate trajectory...
             </div>
           ) : areaData.length === 0 ? (
-            <div style={{ padding: 40, textAlign: "center" }}>
+            <div style={{ padding: 40, textAlign: "center", color: "#64748b" }}>
               No sales data available
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={320}>
-              <AreaChart data={areaData}>
+            <ResponsiveContainer width="100%" height={380}>
+              <AreaChart data={areaData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  {Object.keys(areaData[0]).filter(k => k !== "name").map((branch, i) => (
+                    <linearGradient key={`grad-${branch}`} id={`color-${branch.replace(/\s+/g, '-')}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={COLORS[i % COLORS.length]} stopOpacity={0.1} />
+                    </linearGradient>
+                  ))}
+                </defs>
 
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
 
                 <XAxis
                   dataKey="name"
-                  stroke="#94a3b8"
-                  angle={-40}
-                  textAnchor="end"
-                  height={60}
+                  stroke="#64748b"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  dy={10}
+                  interval={Math.floor(areaData.length / 10)}
                 />
 
-                <YAxis stroke="#94a3b8" />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={v => `₹${(v/1000).toFixed(0)}k`}
+                />
 
                 <Tooltip
                   contentStyle={{
-                    background: "#0f172a",
-                    border: "1px solid #334155"
+                    background: "rgba(15, 23, 42, 0.95)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "12px",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                    padding: "16px"
                   }}
+                  itemStyle={{ fontSize: "12px", color: "#f8fafc" }}
+                  labelStyle={{ color: "#94a3b8", fontWeight: "bold", marginBottom: "8px" }}
                 />
 
-                <Legend />
+                <Legend 
+                  onClick={toggleBranch}
+                  iconType="circle"
+                  wrapperStyle={{ paddingTop: "30px", cursor: "pointer", userSelect: "none" }} 
+                  formatter={(value) => (
+                    <span style={{ 
+                      color: hiddenBranches.has(value) ? "#475569" : "#e2e8f0",
+                      textDecoration: hiddenBranches.has(value) ? "line-through" : "none",
+                      fontSize: "12px",
+                      opacity: hiddenBranches.has(value) ? 0.5 : 1
+                    }}>
+                      {value}
+                    </span>
+                  )}
+                />
 
                 {Object.keys(areaData[0])
                   .filter(k => k !== "name")
@@ -180,10 +226,11 @@ const OwnerDashboard = () => {
                       key={branch}
                       type="monotone"
                       dataKey={branch}
+                      stackId="1"
                       stroke={COLORS[i % COLORS.length]}
-                      fill={COLORS[i % COLORS.length]}
-                      fillOpacity={0.25}
-                      strokeWidth={3}
+                      fill={`url(#color-${branch.replace(/\s+/g, '-')})`}
+                      strokeWidth={1}
+                      hide={hiddenBranches.has(branch)}
                     />
                   ))}
 

@@ -129,3 +129,17 @@ CREATE INDEX IF NOT EXISTS idx_expenses_branch_id ON expenses(branch_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_branch_id ON inventory(branch_id);
 CREATE INDEX IF NOT EXISTS idx_employees_branch_id ON employees(branch_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_branch_id ON notifications(branch_id);
+
+-- 11. Create HQ Reports Table
+CREATE TABLE IF NOT EXISTS hq_reports (
+  report_id VARCHAR(50) PRIMARY KEY,
+  franchise_id INTEGER NOT NULL REFERENCES franchises(franchise_id),
+  title VARCHAR(255) NOT NULL,
+  type VARCHAR(50) NOT NULL,
+  status VARCHAR(50) DEFAULT 'Draft',
+  summary TEXT,
+  tags TEXT[],
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_hq_reports_franchise_id ON hq_reports(franchise_id);

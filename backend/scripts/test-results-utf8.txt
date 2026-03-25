@@ -1,0 +1,15 @@
+Environment loaded: baseUrl, franchiseId, branchId, ownerId, inventoryId, employeeId, notificationId
+
+--- FOLDER: Auth ---
+
+REQUEST: [POST] Forgot Password -> http://localhost:5000/api/auth/forgot-password
+   Status: 500
+   FAIL: Status is 200 or 404 (Expected 500 to be one of [200, 404])
+   PASS: Response has message field
+
+REQUEST: [POST] Login - Missing Fields -> http://localhost:5000/api/auth/login
+   Status: 400
+   FAIL: Status is 400 (Cannot read properties of undefined (reading 'have'))
+   PASS: Response has message field
+
+REQUEST: [POST] Login -> http://localhost:5000/api/auth/login

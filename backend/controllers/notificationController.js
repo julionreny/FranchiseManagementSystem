@@ -110,3 +110,22 @@ exports.getOwnerNotifications = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch owner notifications" });
   }
 };
+
+/* =========================
+   CLEAR ALL OWNER NOTIFICATIONS
+========================= */
+exports.clearOwnerNotifications = async (req, res) => {
+  const { franchiseId } = req.params;
+  try {
+    await db.query(
+      `DELETE FROM notifications 
+       WHERE branch_id IN (SELECT branch_id FROM branches WHERE franchise_id = $1)
+       AND role_id = 1`,
+      [franchiseId]
+    );
+    res.json({ message: "All owner notifications cleared" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to clear owner notifications" });
+  }
+};

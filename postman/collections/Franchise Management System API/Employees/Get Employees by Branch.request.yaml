@@ -1,0 +1,17 @@
+$kind: http-request
+name: Get Employees by Branch
+method: GET
+url: '{{baseUrl}}/api/employees/{{branchId}}'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function() {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.be.an("array");
+      });

@@ -1,0 +1,32 @@
+$kind: http-request
+name: Register Owner
+method: POST
+url: '{{baseUrl}}/api/auth/owner/register'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Test Owner",
+      "email": "owner@test.com",
+      "password": "password123",
+      "franchise_name": "Test Franchise",
+      "location": "Kuala Lumpur",
+      "contact_email": "contact@test.com",
+      "description": "Test franchise description"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201 or 403", function() {
+        pm.expect(pm.response.code).to.be.oneOf([201, 403]);
+      });
+
+      pm.test("Response body is an object", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.be.an("object");
+      });

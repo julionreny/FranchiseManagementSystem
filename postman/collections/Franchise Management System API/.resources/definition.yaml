@@ -1,0 +1,6 @@
+$kind: collection
+name: Franchise Management System API
+description: Complete API collection for the Franchise Management System backend with test scripts for all endpoints.
+variables:
+  - key: baseUrl
+    value: 'http://localhost:5000'

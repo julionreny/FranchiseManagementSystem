@@ -1,0 +1,27 @@
+$kind: http-request
+name: Create Branch - Missing Fields
+method: POST
+url: '{{baseUrl}}/api/branches/create'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "franchise_id": "{{franchiseId}}",
+      "branch_name": "Incomplete Branch"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function() {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test("Response has error field", function() {
+        var json = pm.response.json();
+        pm.expect(json).to.have.property("error");
+      });

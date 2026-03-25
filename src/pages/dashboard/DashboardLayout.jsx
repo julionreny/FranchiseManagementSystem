@@ -42,6 +42,8 @@ const DashboardLayout = () => {
 
   // Owner-only extras
   const ownerExtras = [
+    { name: "System Analytics", icon: <FiBarChart2 />, path: "/owner-dashboard/analytics" },
+    { name: "HQ Reports", icon: <FiFileText />, path: "/owner-dashboard/reports" },
     { name: "Manage Branches",    icon: <FiGlobe />,      path: "/owner-dashboard/branches" },
     { name: "Branch Performance", icon: <FiBarChart2 />, path: "/owner-dashboard/performance" },
   ];

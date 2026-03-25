@@ -1,0 +1,30 @@
+name: Local Environment
+values:
+  - key: baseUrl
+    value: 'http://localhost:5000'
+    enabled: true
+    type: default
+  - key: franchiseId
+    value: '1'
+    enabled: true
+    type: default
+  - key: branchId
+    value: '1'
+    enabled: true
+    type: default
+  - key: ownerId
+    value: '1'
+    enabled: true
+    type: default
+  - key: inventoryId
+    value: '1'
+    enabled: true
+    type: default
+  - key: employeeId
+    value: '1'
+    enabled: true
+    type: default
+  - key: notificationId
+    value: '1'
+    enabled: true
+    type: default

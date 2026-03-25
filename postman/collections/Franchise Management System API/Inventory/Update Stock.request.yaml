@@ -1,0 +1,29 @@
+$kind: http-request
+name: Update Stock
+method: PUT
+url: '{{baseUrl}}/api/inventory/update-quantity/{{inventoryId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantity": 25
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200 or 404", function() {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+
+      if (pm.response.code === 200) {
+        pm.test("Response has inventory_id and quantity", function() {
+          var json = pm.response.json();
+          pm.expect(json).to.have.property("inventory_id");
+          pm.expect(json).to.have.property("quantity");
+        });
+      }

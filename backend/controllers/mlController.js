@@ -1,57 +1,53 @@
 const db = require("../config/db");
-const { calculateLinearRegression } = require("../utils/mlUtils");
+const { buildForecast } = require("../../ml/forecasting.cjs");
 
+/**
+ * GET /api/dashboard/forecast/:franchiseId
+ * Uses weighted linear regression + EWMA smoothing from ml/forecasting.js
+ * to forecast the next 30 days of network revenue.
+ */
 exports.getSalesForecast = async (req, res) => {
   const { franchiseId } = req.params;
+
   try {
-    // Fetch daily sales for the last 60 days to establish a trend
+    // Aggregate daily revenue across ALL branches in the franchise for last 90 days.
+    // generate_series ensures every day appears (gaps filled with 0).
     const result = await db.query(
       `SELECT
-         d.date::date as date,
+         d.date::date AS date,
          COALESCE(SUM(s.amount), 0) AS daily_revenue
-       FROM generate_series(CURRENT_DATE - INTERVAL '60 days', CURRENT_DATE, '1 day') AS d(date)
-       CROSS JOIN branches b
-       LEFT JOIN sales s ON s.branch_id = b.branch_id AND DATE(s.sale_date) = d.date
-       WHERE b.franchise_id = $1
+       FROM generate_series(
+              CURRENT_DATE - INTERVAL '89 days',
+              CURRENT_DATE,
+              '1 day'
+            ) AS d(date)
+       LEFT JOIN (
+         SELECT s.amount, s.sale_date
+         FROM sales s
+         JOIN branches b ON s.branch_id = b.branch_id
+         WHERE b.franchise_id = $1
+       ) s ON DATE(s.sale_date) = d.date
        GROUP BY d.date
        ORDER BY d.date`,
       [franchiseId]
     );
 
-    const historicalData = result.rows.map((row, index) => ({
-      x: index,
-      y: Number(row.daily_revenue),
-      date: row.date
-    }));
-
-    const { slope, intercept, rSquared } = calculateLinearRegression(historicalData);
-
-    // Predict next 30 days
-    const lastIndex = historicalData.length - 1;
-    let predictedTotal30Days = 0;
-    const forecastPoints = [];
-
-    for (let i = 1; i <= 30; i++) {
-      const nextX = lastIndex + i;
-      const prediction = Math.max(0, slope * nextX + intercept);
-      predictedTotal30Days += prediction;
-      
-      // We'll return some forecast points for the chart
-      if (i % 5 === 0 || i === 1 || i === 30) {
-        forecastPoints.push({
-          day: i,
-          prediction: Math.round(prediction)
-        });
-      }
+    if (result.rows.length === 0) {
+      return res.json({
+        historicalPoints: [],
+        forecastPoints: [],
+        predictedTotal30Days: 0,
+        confidenceScore: 0,
+        slope: 0,
+        weeklyAvg: 0,
+        trend: "STABLE",
+        trendPct: 0,
+      });
     }
 
-    res.json({
-      predictedTotal30Days: Math.round(predictedTotal30Days),
-      confidenceScore: Math.round(rSquared * 100),
-      slope: Number(slope.toFixed(2)),
-      forecastPoints,
-      historicalAvg: historicalData.reduce((a, b) => a + b.y, 0) / historicalData.length
-    });
+    // Delegate all ML computation to ml/forecasting.js
+    const payload = buildForecast(result.rows, 30);
+    res.json(payload);
 
   } catch (err) {
     console.error("Forecasting Error:", err);

@@ -1,0 +1,4 @@
+$kind: collection
+name: Dashboard
+description: Dashboard statistics and analytics endpoints
+order: 10000
